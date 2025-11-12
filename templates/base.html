@@ -1,0 +1,37 @@
+<!-- All Code from w3schools - https://www.w3schools.com/html/default.asp -->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ title or "FYP App" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <a href="{{ url_for('home') }}" class="logo">FYP</a>
+      <div class="links">
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('logout') }}">Logout</a>
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('users') }}">Admin</a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('login') }}">Login</a>
+          <a href="{{ url_for('signup') }}">Sign Up</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat,msg in msgs %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

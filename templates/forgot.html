@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Forgot Password</h1>
+<form method="post">
+  <div>
+    <label>Email</label>
+    <input type="email" name="email" required>
+  </div>
+  <button type="submit">Send Reset Link</button>
+</form>
+<p>(For this demo, the reset link prints in the terminal.)</p>
+{% endblock %}
