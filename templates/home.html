@@ -3,6 +3,7 @@
 <h1>Welcome to FYP</h1>
 {% if current_user.is_authenticated %}
   <p>Hello, <strong>{{ current_user.full_name }}</strong>!</p>
+  <p><a class="btn" href="{{ url_for('goals_dashboard') }}">Your savings goals</a></p>
   {% if current_user.is_admin %}
     <p><a class="btn" href="{{ url_for('users') }}">Manage Users</a></p>
   {% endif %}
