@@ -270,7 +270,7 @@ def users_delete(user_id: int):
     return redirect(url_for("users"))
 
 
-# Savings Goals ----------------------------------------------------
+# Savings Goals
 # Reference: Flask docs on login_required dashboards + personal design.
 # Description: Renders the overview page with progress maths and deposit history.
 @app.route("/goals")
