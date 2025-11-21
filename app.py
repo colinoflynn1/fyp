@@ -90,7 +90,7 @@ def home():
 
 
 # Reference: Python Decimal docs + Flask request handling.
-# Description: Validates decimal form inputs and provides human-friendly errors.
+# Validates decimal form inputs and provides human-friendly errors.
 def _parse_decimal_field(value: str, field_name: str):
     try:
         return Decimal(value)
@@ -99,7 +99,7 @@ def _parse_decimal_field(value: str, field_name: str):
 
 
 # Reference: Python datetime strptime patterns.
-# Description: Converts YYYY-MM-DD strings into date objects for DB writes.
+# Converts YYYY-MM-DD strings into date objects for DB writes.
 def _parse_date_field(value: str):
     try:
         return datetime.strptime(value, "%Y-%m-%d").date()
@@ -108,7 +108,7 @@ def _parse_date_field(value: str):
 
 
 # Reference: Flask pattern for reusing template context.
-# Description: Centralizes the data required for both create/edit templates.
+# Centralizes the data required for both create/edit templates.
 def _render_goal_form(mode: str, goal: dict | None = None):
     title = "New Goal" if mode == "create" else "Edit Goal"
     return render_template(
@@ -272,7 +272,7 @@ def users_delete(user_id: int):
 
 # Savings Goals
 # Reference: Flask docs on login_required dashboards + personal design.
-# Description: Renders the overview page with progress maths and deposit history.
+# Renders the overview page with progress maths and deposit history.
 @app.route("/goals")
 @login_required
 def goals_dashboard():
@@ -291,7 +291,7 @@ def goals_dashboard():
 
 
 # Reference: Flask form handling docs (https://flask.palletsprojects.com/patterns/wtforms/)
-# Description: Handles creation of a new savings goal with validation feedback.
+# Handles creation of a new savings goal with validation feedback.
 @app.route("/goals/new", methods=["GET", "POST"])
 @login_required
 def goal_new():
@@ -348,7 +348,7 @@ def goal_new():
 
 
 # Reference: Same as goal_new (Flask form handling).
-# Description: Allows the user to update target numbers, timeline, or cadence.
+# Allows the user to update target numbers, timeline, or cadence.
 @app.route("/goals/<int:goal_id>/edit", methods=["GET", "POST"])
 @login_required
 def goal_edit(goal_id: int):
@@ -402,7 +402,7 @@ def goal_edit(goal_id: int):
 
 
 # Reference: REST-style delete endpoint pattern + Flask docs.
-# Description: Removes a goal and cascades deposits using DB foreign keys.
+# Removes a goal and cascades deposits using DB foreign keys.
 @app.route("/goals/<int:goal_id>/delete", methods=["POST"])
 @login_required
 def goal_delete(goal_id: int):
@@ -413,8 +413,8 @@ def goal_delete(goal_id: int):
     return redirect(url_for("goals_dashboard"))
 
 
-# Reference: Double-entry deposit pattern inspired by budgeting apps.
-# Description: Adds a lump-sum payment to an existing goal and updates totals.
+# Reference: flask doc + based on chatgpt chat.
+# Adds a lump-sum payment to an existing goal and updates totals.
 @app.route("/goals/<int:goal_id>/deposit", methods=["POST"])
 @login_required
 def goal_deposit(goal_id: int):
@@ -437,8 +437,8 @@ def goal_deposit(goal_id: int):
     return redirect(url_for("goals_dashboard"))
 
 
-# Reference: Guided contribution workflow inspired by budgeting apps.
-# Description: Records the recommended amount when the user confirms they paid.
+# Reference: flask doc + based on chatgpt chat.
+# Records the recommended amount when the user confirms they paid.
 @app.route("/goals/<int:goal_id>/auto-contribute", methods=["POST"])
 @login_required
 def goal_auto_contribute(goal_id: int):
@@ -467,8 +467,8 @@ def goal_auto_contribute(goal_id: int):
     return redirect(url_for("goals_dashboard"))
 
 
-# Reference: Habit tracking UX patterns for defer/skip actions.
-# Description: Moves the next contribution date forward without adding funds.
+# Reference: Flask doc + based on chatgpt chat.
+# Moves the next contribution date forward without adding funds.
 @app.route("/goals/<int:goal_id>/skip-period", methods=["POST"])
 @login_required
 def goal_skip_period(goal_id: int):

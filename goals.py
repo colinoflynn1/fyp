@@ -10,8 +10,8 @@ from typing import Dict, List, Optional
 from db import get_conn
 
 
-# Reference: Personal research + Monzo budgeting articles.
-# Description: Enumerations for user-selectable contribution cadence and the
+# Reference: Python docs
+# Enumerations for user-selectable contribution cadence and the
 # approximate number of days used for workload calculations.
 FREQUENCIES = ("weekly", "bi-weekly", "monthly")
 PERIOD_DAY_MAP = {
@@ -22,16 +22,15 @@ PERIOD_DAY_MAP = {
 
 
 # Reference: Python docs on Decimal quantize (https://docs.python.org/3/library/decimal.html)
-# Description: Helper that ensures every currency input/output is rounded to cents.
+# Helper that ensures every currency input/output is rounded to cents.
 def _to_decimal(value: Decimal | float | int) -> Decimal:
     if isinstance(value, Decimal):
         return value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     return Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
-# Reference: Official MySQL doc on CREATE TABLE/ALTER TABLE + FK constraints.
-# Description: Ensures the savings tables exist before the app continues and are updated
-# with newer columns (like next_due_date) when we deploy new features.
+# Reference: Official MySQL doc
+# Ensures the savings tables exist before the app continues and are updated
 def ensure_goal_tables() -> None:
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute(
@@ -91,7 +90,7 @@ ensure_goal_tables()
 
 
 # Reference: CRUD pattern adapted from user.py + MySQL docs.
-# Description: Creates a savings goal and records an optional initial deposit.
+# Creates a savings goal and records an optional initial deposit.
 def create_goal(
     *,
     user_id: int,
@@ -199,7 +198,7 @@ def update_goal(
 
 
 # Reference: CRUD delete pattern from user.py + MySQL docs.
-# Description: Removes a goal and cascades deposits via the FK.
+#Removes a goal and cascades deposits via the FK.
 def delete_goal(goal_id: int, *, user_id: int) -> bool:
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute(
@@ -209,7 +208,7 @@ def delete_goal(goal_id: int, *, user_id: int) -> bool:
         return cur.rowcount > 0
 
 
-# Reference: Double-entry style update based on fintech blogs (e.g. YNAB) + MySQL docs.
+#Reference: flask doc + based on chatgpt chat from app.py
 # Description: Adds a lump-sum deposit and increments the saved total atomically.
 def add_deposit(goal_id: int, *, user_id: int, amount: Decimal, note: str = "") -> bool:
     amount = _to_decimal(amount)
@@ -244,8 +243,8 @@ def add_deposit(goal_id: int, *, user_id: int, amount: Decimal, note: str = "") 
         return True
 
 
-# Reference: Habit tracking UX patterns for grace periods.
-# Description: Skips the current contribution period without adding a deposit.
+# Reference: flask doc + based on chatgpt chat from app.py
+# Skips the current contribution period without adding a deposit.
 def skip_next_due(goal_id: int, *, user_id: int) -> Optional[date]:
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute(
@@ -268,16 +267,15 @@ def skip_next_due(goal_id: int, *, user_id: int) -> Optional[date]:
         return next_due
 
 
-# Reference: Goal scheduling helper derived from PERIOD_DAY_MAP logic.
-# Description: Moves the next due date forward based on frequency.
+# Reference: flask doc/python docs + based on chatgpt chat from app.py
+# Moves the next due date forward based on frequency.
 def calculate_next_due_date(start_date: date, frequency: str) -> date:
     days = PERIOD_DAY_MAP.get(frequency, 30)
     return start_date + timedelta(days=days)
 
 
-# Reference: Summary card maths inspired by NerdWallet savings calculators
-# and habit tracking UX patterns.
-# Description: Returns contextual stats for template rendering incl. due dates.
+# Reference: flask doc/python docs + based on chatgpt chat from app.py
+# eturns contextual stats for template rendering incl. due dates.
 def list_deposits(goal_id: int, *, user_id: int, limit: int = 50) -> List[Dict]:
     sql = """
         SELECT d.id, d.amount, d.note, d.created_at
@@ -292,8 +290,8 @@ def list_deposits(goal_id: int, *, user_id: int, limit: int = 50) -> List[Dict]:
         return cur.fetchall()
 
 
-# Reference: Summary card maths inspired by NerdWallet savings calculators.
-# Description: Returns contextual stats for template rendering.
+# Reference: flask doc/python docs + based on chatgpt chat from app.py
+# Returns contextual stats for template rendering.
 def build_progress(goal: Dict) -> Dict:
     target_amount = _to_decimal(goal["target_amount"])
     saved_amount = _to_decimal(goal["saved_amount"])
