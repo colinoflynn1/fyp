@@ -10,7 +10,9 @@ from db import get_conn
 from goals import list_goals, build_progress
 
 
-# Reference: Python docs on MySQL CREATE TABLE + contextlib [NEW]
+# Reference: Based on ensure_goal_tables() in goals.py (line 34)
+# Python docs on MySQL CREATE TABLE: https://dev.mysql.com/doc/refman/8.0/en/create-table.html
+# contextlib.suppress: https://docs.python.org/3/library/contextlib.html#contextlib.suppress
 # Ensures the notifications table exists before the app continues
 def ensure_notification_tables() -> None:
     """Create notifications table if it doesn't exist."""
@@ -56,7 +58,8 @@ def ensure_notification_tables() -> None:
 ensure_notification_tables()
 
 
-# Reference: CRUD pattern from user.py + goals.py [NEW]
+# Reference: Based on create_user() in user.py (line 124) and create_goal() in goals.py (line 94)
+# MySQL INSERT: https://dev.mysql.com/doc/refman/8.0/en/insert.html
 # Creates a dashboard notification for a user
 def create_notification(
     user_id: int,
@@ -87,9 +90,8 @@ def create_notification(
         return cur.lastrowid
 
 
-# Reference: MySQL Documentation - SELECT with WHERE clauses [NEW]
-# https://dev.mysql.com/doc/refman/8.0/en/select.html
-# CRUD pattern adapted from user.py and goals.py
+# Reference: Based on list_users() in user.py (line 97) and list_goals() in goals.py (line 136)
+# MySQL SELECT with WHERE: https://dev.mysql.com/doc/refman/8.0/en/select.html
 # Lists unread notifications for a user
 def list_notifications(user_id: int, limit: int = 50, unread_only: bool = False) -> List[Dict]:
     """
@@ -124,9 +126,8 @@ def list_notifications(user_id: int, limit: int = 50, unread_only: bool = False)
         return cur.fetchall()
 
 
-# Reference: MySQL Documentation - UPDATE statement [NEW]
-# https://dev.mysql.com/doc/refman/8.0/en/update.html
-# CRUD update pattern adapted from user.py and goals.py
+# Reference: Based on update_user() in user.py (line 47) and update_goal() in goals.py (line 165)
+# MySQL UPDATE: https://dev.mysql.com/doc/refman/8.0/en/update.html
 # Marks a notification as read
 def mark_notification_read(notification_id: int, user_id: int) -> bool:
     """Mark a notification as read."""
@@ -140,9 +141,8 @@ def mark_notification_read(notification_id: int, user_id: int) -> bool:
         return cur.rowcount > 0
 
 
-# Reference: MySQL Documentation - UPDATE with WHERE clause [NEW]
-# https://dev.mysql.com/doc/refman/8.0/en/update.html
-# Bulk update pattern for user notifications
+# Reference: Based on update_user() pattern in user.py (line 47)
+# MySQL UPDATE with WHERE: https://dev.mysql.com/doc/refman/8.0/en/update.html
 # Marks all notifications for a user as read
 def mark_all_read(user_id: int) -> int:
     """Mark all notifications for a user as read. Returns count of updated rows."""
@@ -156,10 +156,9 @@ def mark_all_read(user_id: int) -> int:
         return cur.rowcount
 
 
-# Reference: Python datetime documentation - Date arithmetic [NEW]
-# https://docs.python.org/3/library/datetime.html#datetime.date
-# Based on goals.py build_progress logic for due date calculations
-# Notification creation pattern adapted from standard notification systems
+# Reference: Based on build_progress() in goals.py (line 295) for date calculations
+# Python datetime.date: https://docs.python.org/3/library/datetime.html#datetime.date
+# Uses list_goals() from goals.py (line 136) and build_progress() for due date logic
 # Checks for upcoming payment due dates and creates notifications
 def check_payment_due_notifications(user_id: int) -> List[int]:
     """
@@ -178,8 +177,8 @@ def check_payment_due_notifications(user_id: int) -> List[int]:
         
         if next_due_date:
             days_until_due = (next_due_date - today).days
-            # Notify if due today or in the next 3 days
-            if days_until_due <= 3 and days_until_due >= 0:
+            # Notify at 7 days, 2 days, 1 day (tomorrow), and today
+            if days_until_due in [7, 2, 1, 0]:
                 if days_until_due == 0:
                     title = f"Payment Due Today: {goal['goal_name']}"
                     message = (
@@ -192,19 +191,26 @@ def check_payment_due_notifications(user_id: int) -> List[int]:
                         f"Your {goal['goal_name']} goal has a payment due tomorrow. "
                         f"Recommended amount: €{progress['recommended_contribution']:.2f}"
                     )
-                else:
-                    title = f"Payment Due Soon: {goal['goal_name']}"
+                elif days_until_due == 2:
+                    title = f"Payment Due in 2 Days: {goal['goal_name']}"
                     message = (
-                        f"Your {goal['goal_name']} goal has a payment due in {days_until_due} days. "
+                        f"Your {goal['goal_name']} goal has a payment due in 2 days. "
+                        f"Recommended amount: €{progress['recommended_contribution']:.2f}"
+                    )
+                else:  # days_until_due == 7
+                    title = f"Payment Due in 7 Days: {goal['goal_name']}"
+                    message = (
+                        f"Your {goal['goal_name']} goal has a payment due in 7 days. "
                         f"Recommended amount: €{progress['recommended_contribution']:.2f}"
                     )
                 
-                # Check if notification already exists (avoid duplicates)
-                existing = list_notifications(user_id, limit=100)
+                # Check if notification already exists for this specific day (avoid duplicates)
+                # Check ALL notifications (read and unread) to prevent recreating after marking as read
+                existing = list_notifications(user_id, limit=100, unread_only=False)
                 if not any(
                     n.get("goal_id") == goal["id"] 
                     and n.get("notification_type") == "payment_due"
-                    and n.get("is_read") == False
+                    and f"{days_until_due} day" in n.get("message", "").lower()
                     for n in existing
                 ):
                     notif_id = create_notification(
@@ -219,10 +225,9 @@ def check_payment_due_notifications(user_id: int) -> List[int]:
     return created_ids
 
 
-# Reference: Python documentation - Percentage calculations [NEW]
-# https://docs.python.org/3/library/functions.html#round
-# Based on goals.py build_progress milestone detection logic
-# Milestone threshold checking adapted from standard progress tracking patterns
+# Reference: Based on build_progress() in goals.py (line 295) for percentage calculations
+# Python percentage calculations: https://docs.python.org/3/library/functions.html#round
+# Uses list_goals() from goals.py (line 136) and build_progress() for milestone detection
 # Checks for milestone achievements and creates notifications
 def check_milestone_notifications(user_id: int, goal_id: Optional[int] = None) -> List[int]:
     """

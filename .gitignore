@@ -11,3 +11,7 @@ __pycache__/
 # IDE files
 .idea/
 .vscode/
+
+# Gmail API credentials and tokens (wouldnt commit)
+token.json
+credentials.json

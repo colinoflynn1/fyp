@@ -1,4 +1,7 @@
-"""Gmail API integration for sending email notifications."""
+"""Gmail API integration for sending email notifications.
+Below is Based on YouTube walkthrough - https://www.youtube.com/watch?v=p7cn1n1kx3I and AI Chat-https://claude.ai/share/14cee1ee-bd27-477d-ae54-53db247f9c34
+
+."""
 
 from __future__ import annotations
 
@@ -9,7 +12,7 @@ from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from dotenv import load_dotenv
 
-# Try to import Gmail API, but make it optional if not installed
+# import Gmail API, but make it optional if not installed
 try:
     from google.auth.transport.requests import Request
     from google.oauth2.credentials import Credentials
@@ -35,7 +38,7 @@ def get_gmail_service():
     """
     Get authenticated Gmail service instance.
     
-    Reference: Gmail API Python Quickstart [NEW]
+    Reference: Gmail API Python Quickstart
     https://developers.google.com/gmail/api/quickstart/python
     
     Returns:
@@ -97,11 +100,7 @@ def get_gmail_service():
         return None
 
 
-# Reference: Gmail API Python Client Library - Sending Messages [NEW]
-# https://developers.google.com/gmail/api/guides/sending
-# Python email.mime documentation for MIME message construction
-# https://docs.python.org/3/library/email.mime.html
-# Base64 encoding for email messages: https://docs.python.org/3/library/base64.html
+# send email function based on youtube
 def send_email(to_email: str, subject: str, body: str, html_body: Optional[str] = None) -> bool:
     """
     Send an email using Gmail API.
@@ -158,7 +157,7 @@ def send_email(to_email: str, subject: str, body: str, html_body: Optional[str] 
         return False
 
 
-# Reference: Standard email template pattern for password reset [NEW]
+# Reference: Standard email template pattern for password reset 
 # Adapted from common password reset email implementations
 # HTML email formatting based on email best practices
 def send_password_reset_email(user_email: str, user_name: str, reset_url: str) -> bool:

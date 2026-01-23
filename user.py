@@ -5,7 +5,7 @@ from db import get_conn
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-# Reference: Similar pattern to goals.py ensure_goal_tables [NEW - Notification preferences]
+# Reference: Based on Similar pattern to goals.py ensure_goal_tables 
 # Ensures the users table has notification preference columns
 def ensure_user_table():
     """Ensure users table has notification preference columns."""
@@ -32,7 +32,7 @@ def ensure_user_table():
 ensure_user_table()
 
 
-# Reference: MySQL Documentation - INSERT statement
+# Reference: Based on MySQL Documentation - INSERT statement
 # https://dev.mysql.com/doc/refman/8.0/en/insert.html
 # BASIC CRUD FOR ADMIN PANEL
 
@@ -44,7 +44,7 @@ def add_user(email: str, full_name: str, role: str = "user") -> int:
         return cur.lastrowid
 
 
-# Reference: MySQL Documentation - UPDATE statement
+# Reference: Based on MySQL Documentation - UPDATE statement
 # https://dev.mysql.com/doc/refman/8.0/en/update.html
 # Dynamic SQL construction pattern adapted from Flask-SQLAlchemy patterns
 def update_user(user_id: int, *,
@@ -79,7 +79,7 @@ def update_user(user_id: int, *,
         return cur.rowcount > 0
 
 
-# Reference: MySQL Documentation - DELETE statement
+# Reference: Based on MySQL Documentation - DELETE statement
 # https://dev.mysql.com/doc/refman/8.0/en/delete.html
 def delete_user(user_id: int) -> bool:
     """Delete a user by ID."""
@@ -88,7 +88,7 @@ def delete_user(user_id: int) -> bool:
         return cur.rowcount > 0
 
 
-# Reference: MySQL Documentation - SELECT statement
+# Reference: Based on MySQL Documentation - SELECT statement
 # https://dev.mysql.com/doc/refman/8.0/en/select.html
 # Used by Flask-Login user_loader callback
 def get_user_by_id(user_id: int) -> Optional[Dict[str, Any]]:
@@ -104,7 +104,7 @@ def get_user_by_id(user_id: int) -> Optional[Dict[str, Any]]:
         return cur.fetchone()
 
 
-# Reference: MySQL Documentation - SELECT with LIMIT
+# Reference: Based on MySQL Documentation - SELECT with LIMIT
 # https://dev.mysql.com/doc/refman/8.0/en/select.html#select-limit
 # Admin table listing pattern
 def list_users(limit: int = 200) -> List[Dict[str, Any]]:
@@ -119,7 +119,7 @@ def list_users(limit: int = 200) -> List[Dict[str, Any]]:
 
 
 # ----------------------------
-# Reference: MySQL Documentation - SELECT with WHERE clause
+# Reference: Based on MySQL Documentation - SELECT with WHERE clause
 # https://dev.mysql.com/doc/refman/8.0/en/select.html#select-where
 #AUTHENTICATION HELPERS
 
@@ -136,7 +136,7 @@ def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
         return cur.fetchone()
 
 
-# Reference: Werkzeug Security Documentation - Password Hashing
+# Reference: Based on Werkzeug Security Documentation - Password Hashing
 # https://werkzeug.palletsprojects.com/en/3.0.x/utils/#werkzeug.security.generate_password_hash
 # MySQL INSERT pattern for user creation
 def create_user(email: str, full_name: str, password: str, role: str = "user") -> int:
@@ -152,7 +152,7 @@ def create_user(email: str, full_name: str, password: str, role: str = "user") -
         return cur.lastrowid
 
 
-# Reference: Werkzeug Security Documentation - Password Hashing
+# Reference: Based on Werkzeug Security Documentation - Password Hashing
 # https://werkzeug.palletsprojects.com/en/3.0.x/utils/#werkzeug.security.generate_password_hash
 # MySQL UPDATE pattern for password changes
 def set_password(user_id: int, new_password: str) -> None:
@@ -163,7 +163,7 @@ def set_password(user_id: int, new_password: str) -> None:
         cur.execute(sql, (pw_hash, user_id))
 
 
-# Reference: Werkzeug Security Documentation - Password Checking
+# Reference: Based on Werkzeug Security Documentation - Password Checking
 # https://werkzeug.palletsprojects.com/en/3.0.x/utils/#werkzeug.security.check_password_hash
 def verify_password(pw_hash: Optional[str], password: str) -> bool:
     """Check if a plain password matches its hash."""

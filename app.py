@@ -44,7 +44,7 @@ from email_service import (
 )
 
 
-# Reference: Flask Documentation - Application Setup
+# Reference: Based on Flask Documentation - Application Setup
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#a-minimal-application
 # Flask App Setup
 load_dotenv()
@@ -52,20 +52,20 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-key")
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=7)
 
-# Reference: ItsDangerous Documentation - URL Safe Timed Serializer
+# Reference: Based on ItsDangerous Documentation - URL Safe Timed Serializer
 # https://itsdangerous.palletsprojects.com/en/2.1.x/serializer/
 # Serializer for password reset tokens
 serializer = URLSafeTimedSerializer(app.secret_key)
 
 
-# Reference: Flask-Login Documentation - Initializing the Login Manager
+# Reference: Based on Flask-Login Documentation - Initializing the Login Manager
 # https://flask-login.readthedocs.io/en/latest/#flask_login.LoginManager
 #Flask-Login Setup
 login_manager = LoginManager(app)
 login_manager.login_view = "login"  # redirect here if not logged in
 
 
-# Reference: Flask-Login Documentation - User Class
+# Reference: Based on Flask-Login Documentation - User Class
 # https://flask-login.readthedocs.io/en/latest/#flask_login.UserMixin
 class AuthUser(UserMixin):
     """Wraps DB user rows for Flask-Login."""
@@ -80,7 +80,7 @@ class AuthUser(UserMixin):
         return self.role == "admin"
 
 
-# Reference: Flask-Login Documentation - User Loader
+# Reference: Based on Flask-Login Documentation - User Loader
 # https://flask-login.readthedocs.io/en/latest/#flask_login.LoginManager.user_loader
 @login_manager.user_loader
 def load_user(user_id: str):
@@ -88,7 +88,7 @@ def load_user(user_id: str):
     return AuthUser(u) if u else None
 
 
-# Reference: Flask Documentation - Decorators
+# Reference: Based on Flask Documentation - Decorators
 # https://flask.palletsprojects.com/en/3.0.x/patterns/viewdecorators/
 # Combined with Python functools.wraps pattern
 # https://docs.python.org/3/library/functools.html#functools.wraps
@@ -107,7 +107,7 @@ def admin_required(fn):
 
 
 # Routes
-# Reference: Flask Documentation - Routing [NEW - Enhanced dashboard with notifications]
+# Reference: Based on Flask Documentation - Routing [Enhanced dashboard with notifications]
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#routing
 # Dashboard route pattern adapted from Flask docs on template rendering
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#rendering-templates
@@ -120,14 +120,19 @@ def home():
         for goal in goals:
             enriched_goals.append(build_goal_progress(goal))
         
-        # Get unread notifications
-        notifications = list_notifications(current_user.id, limit=10, unread_only=True)
+        # Get user preferences
+        user = get_user_by_id(current_user.id)
         
-        # Check for payment due dates and create notifications
-        check_payment_due_notifications(current_user.id)
-        
-        # Re-fetch notifications after checking
-        notifications = list_notifications(current_user.id, limit=10, unread_only=True)
+        # Get unread notifications (only if dashboard notifications are enabled)
+        notifications = []
+        if user and user.get("dashboard_notifications", True):
+            notifications = list_notifications(current_user.id, limit=10, unread_only=True)
+            
+            # Check for payment due dates and create notifications
+            check_payment_due_notifications(current_user.id)
+            
+            # Re-fetch notifications after checking
+            notifications = list_notifications(current_user.id, limit=10, unread_only=True)
         
         # Calculate summary stats
         total_saved = sum(Decimal(str(g.get("saved_amount", 0))) for g in enriched_goals)
@@ -136,7 +141,6 @@ def home():
         goals_due = sum(1 for g in enriched_goals if g.get("is_due"))
         
         # Send email notifications if enabled
-        user = get_user_by_id(current_user.id)
         if user and user.get("email_notifications"):
             # Check for payment due dates to email
             for goal in enriched_goals:
@@ -162,7 +166,7 @@ def home():
     return render_template("home.html", title="Home")
 
 
-# Reference: Python Decimal docs + Flask request handling.
+# Reference: Based on Python Decimal docs + Flask request handling.
 # Validates decimal form inputs and provides human-friendly errors.
 def _parse_decimal_field(value: str, field_name: str):
     try:
@@ -171,7 +175,7 @@ def _parse_decimal_field(value: str, field_name: str):
         raise ValueError(f"Invalid number for {field_name}.")
 
 
-# Reference: Python datetime strptime patterns.
+# Reference: Based on Python datetime strptime patterns.
 # Converts YYYY-MM-DD strings into date objects for DB writes.
 def _parse_date_field(value: str):
     try:
@@ -180,7 +184,7 @@ def _parse_date_field(value: str):
         raise ValueError("Please use the YYYY-MM-DD date format.")
 
 
-# Reference: Flask pattern for reusing template context.
+# Reference: Based on Flask pattern for reusing template context.
 # Centralizes the data required for both create/edit templates.
 def _render_goal_form(mode: str, goal: dict | None = None):
     title = "New Goal" if mode == "create" else "Edit Goal"
@@ -193,7 +197,7 @@ def _render_goal_form(mode: str, goal: dict | None = None):
     )
 
 
-# Reference: Flask Documentation - HTTP Methods
+# Reference: Based on Flask Documentation - HTTP Methods
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#http-methods
 # Sign Up
 @app.route("/signup", methods=["GET", "POST"])
@@ -214,7 +218,7 @@ def signup():
     return render_template("signup.html", title="Sign Up")
 
 
-# Reference: Flask-Login Documentation - Login Example
+# Reference: Based on Flask-Login Documentation - Login Example
 # https://flask-login.readthedocs.io/en/latest/#login-example
 # Log In
 @app.route("/login", methods=["GET", "POST"])
@@ -232,7 +236,7 @@ def login():
     return render_template("login.html", title="Log In")
 
 
-# Reference: Flask-Login Documentation - Logout
+# Reference: Based on Flask-Login Documentation - Logout
 # https://flask-login.readthedocs.io/en/latest/#flask_login.logout_user
 # Log Out
 @app.route("/logout")
@@ -242,8 +246,7 @@ def logout():
     flash("Logged out.", "success")
     return redirect(url_for("home"))
 
-# Reference: ItsDangerous Documentation - URL Safe Timed Serializer [NEW - Email integration added]
-# https://itsdangerous.palletsprojects.com/en/2.1.x/serializer/
+
 # Combined with Flask email sending pattern from email_service.py
 # Password reset token generation adapted from standard Flask patterns
 # Forgot Password
@@ -271,14 +274,14 @@ def forgot():
 
 
 
-# Reference: ItsDangerous Documentation - Loading Tokens
+# Reference: Based on ItsDangerous Documentation - Loading Tokens
 # https://itsdangerous.palletsprojects.com/en/2.1.x/serializer/#loading
 # Token validation with max_age parameter
 # Reset Password
 @app.route("/reset/<token>", methods=["GET", "POST"])
 def reset_password(token):
     try:
-        data = serializer.loads(token, max_age=3600)  # 1 hour validity
+        data = serializer.loads(token, max_age=3600) # use loads to verify 1 hour validity
     except SignatureExpired:
         flash("Reset link expired.", "error")
         return redirect(url_for("forgot"))
@@ -361,7 +364,7 @@ def users_delete(user_id: int):
 
 
 # Savings Goals
-# Reference: Flask docs on login_required dashboards + personal design.
+# Reference: Based on Flask docs on login_required dashboards + personal design.
 # Renders the overview page with progress maths and deposit history.
 @app.route("/goals")
 @login_required
@@ -380,7 +383,7 @@ def goals_dashboard():
     )
 
 
-# Reference: Flask form handling docs (https://flask.palletsprojects.com/patterns/wtforms/)
+# Reference: Based on Flask form handling docs (https://flask.palletsprojects.com/patterns/wtforms/)
 # Handles creation of a new savings goal with validation feedback.
 @app.route("/goals/new", methods=["GET", "POST"])
 @login_required
@@ -437,7 +440,7 @@ def goal_new():
     return _render_goal_form("create")
 
 
-# Reference: Same as goal_new (Flask form handling).
+# Reference: Based on Flask form handling docs (https://flask.palletsprojects.com/patterns/wtforms/)
 # Allows the user to update target numbers, timeline, or cadence.
 @app.route("/goals/<int:goal_id>/edit", methods=["GET", "POST"])
 @login_required
@@ -491,7 +494,7 @@ def goal_edit(goal_id: int):
     return _render_goal_form("edit", goal=goal)
 
 
-# Reference: REST-style delete endpoint pattern + Flask docs.
+
 # Removes a goal and cascades deposits using DB foreign keys.
 @app.route("/goals/<int:goal_id>/delete", methods=["POST"])
 @login_required
@@ -503,7 +506,7 @@ def goal_delete(goal_id: int):
     return redirect(url_for("goals_dashboard"))
 
 
-# Reference: Flask Documentation - Form Data Handling [NEW - Milestone checking added]
+# Reference: Based on Flask Documentation - Form Data Handling
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#the-request-object
 # Adds a lump-sum payment to an existing goal and updates totals.
 # Milestone checking integrated after deposit recording
@@ -546,7 +549,7 @@ def goal_deposit(goal_id: int):
     return redirect(url_for("goals_dashboard"))
 
 
-# Reference: Flask Documentation - POST Request Handling [NEW - Milestone checking added]
+# Reference: Based on Flask Documentation - POST Request Handling 
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#http-methods
 # Records the recommended amount when the user confirms they paid.
 # Integrated milestone notification checking after contribution
@@ -593,7 +596,7 @@ def goal_auto_contribute(goal_id: int):
     return redirect(url_for("goals_dashboard"))
 
 
-# Reference: Flask doc + based on chatgpt chat.
+# Reference: Based on Flask doc + based on chatgpt chat in documentation.
 # Moves the next contribution date forward without adding funds.
 @app.route("/goals/<int:goal_id>/skip-period", methods=["POST"])
 @login_required
@@ -609,7 +612,7 @@ def goal_skip_period(goal_id: int):
     return redirect(url_for("goals_dashboard"))
 
 
-# Reference: Flask Documentation - Request Data [NEW]
+# Reference: Based on Flask Documentation - Request Data 
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#accessing-request-data
 # Standard form handling pattern for user preferences
 # User Settings / Notification Preferences
@@ -626,6 +629,8 @@ def settings():
             dashboard_notifications=dashboard_notifications,
         ):
             flash("Notification preferences updated.", "success")
+            # Redirect to home so user can see notifications appear/disappear immediately
+            return redirect(url_for("home"))
         else:
             flash("Could not update preferences.", "error")
         return redirect(url_for("settings"))
@@ -638,7 +643,7 @@ def settings():
     )
 
 
-# Reference: Flask Documentation - Variable Rules [NEW]
+# Reference: Based on Flask Documentation - Variable Rules 
 # https://flask.palletsprojects.com/en/3.0.x/quickstart/#variable-rules
 # RESTful route pattern for notification updates
 # Mark notification as read
@@ -650,7 +655,7 @@ def mark_notification_read_route(notification_id: int):
     return redirect(request.referrer or url_for("home"))
 
 
-# Reference: Flask Documentation - Request Referrer [NEW]
+# Reference: Based on Flask Documentation - Request Referrer 
 # https://flask.palletsprojects.com/en/3.0.x/api/#flask.Request.referrer
 # Bulk update pattern for notifications
 # Mark all notifications as read
