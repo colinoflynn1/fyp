@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block content %}
+{% if current_user.is_authenticated %}
+  <div class="dashboard-header">
+    <div>
+      <h1>Welcome back, {{ current_user.full_name }}!</h1>
+      <p class="subtitle">Track your savings progress and stay on top of your goals.</p>
+    </div>
+    <div class="dashboard-actions">
+      <a class="btn" href="{{ url_for('goal_new') }}">New Goal</a>
+      <a class="btn secondary" href="{{ url_for('settings') }}">Settings</a>
+    </div>
+  </div>
+
+  <!-- Summary Stats -->
+  {% if goals %}
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Saved</h3>
+        <p class="stat-value">€{{ "%.2f"|format(total_saved) }}</p>
+        <p class="stat-subtitle">of €{{ "%.2f"|format(total_target) }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Active Goals</h3>
+        <p class="stat-value">{{ goals|length }}</p>
+        <p class="stat-subtitle">{{ goals_due }} due soon</p>
+      </div>
+      <div class="stat-card">
+        <h3>Remaining</h3>
+        <p class="stat-value">€{{ "%.2f"|format(total_remaining) }}</p>
+        <p class="stat-subtitle">to reach all targets</p>
+      </div>
+      <div class="stat-card">
+        <h3>Notifications</h3>
+        <p class="stat-value">{{ notifications|length }}</p>
+        <p class="stat-subtitle">unread alerts</p>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Notifications Section -->
+  {% if notifications %}
+    <section class="notifications-section">
+      <div class="section-header">
+        <h2>Notifications</h2>
+        <form method="post" action="{{ url_for('mark_all_notifications_read') }}" style="display: inline;">
+          <button type="submit" class="btn-link">Mark all as read</button>
+        </form>
+      </div>
+      <div class="notifications-list">
+        {% for notif in notifications %}
+          <div class="notification-item {% if notif.notification_type == 'milestone' %}milestone{% elif notif.notification_type == 'payment_due' %}payment-due{% elif notif.notification_type == 'goal_completed' %}goal-completed{% endif %}">
+            <div class="notification-content">
+              <h4>{{ notif.title }}</h4>
+              <p>{{ notif.message }}</p>
+              <span class="notification-time">{{ notif.created_at.strftime("%d %b %Y at %H:%M") }}</span>
+            </div>
+            <div class="notification-actions">
+              <form method="post" action="{{ url_for('mark_notification_read_route', notification_id=notif.id) }}">
+                <button type="submit" class="btn-small">Mark read</button>
+              </form>
+              {% if notif.goal_id %}
+                <a href="{{ url_for('goal_view', goal_id=notif.goal_id) }}" class="btn-small secondary">View Goal</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Quick Goals Overview -->
+  {% if goals %}
+    <section class="goals-overview">
+      <div class="section-header">
+        <h2>Your Goals</h2>
+        <a href="{{ url_for('goals_dashboard') }}" class="btn-link">View All →</a>
+      </div>
+      <div class="goal-preview-grid">
+        {% for goal in goals[:3] %}
+          <div class="goal-preview-card {% if goal.is_due %}overdue{% endif %}">
+            <h3>{{ goal.goal_name }}</h3>
+            <div class="progress-track-small">
+              <div class="progress-bar" style="width: {{ goal.percent_complete }}%"></div>
+            </div>
+            <div class="goal-preview-stats">
+              <span>€{{ "%.2f"|format(goal.saved_amount) }} / €{{ "%.2f"|format(goal.target_amount) }}</span>
+              <strong>{{ "%.0f"|format(goal.percent_complete) }}%</strong>
+            </div>
+            {% if goal.is_due %}
+              <p class="due-badge">Due: {{ goal.next_due_date.strftime("%d %b") }}</p>
+            {% endif %}
+            <a href="{{ url_for('goals_dashboard') }}" class="btn-small">View Details</a>
+          </div>
+        {% endfor %}
+      </div>
+      {% if goals|length > 3 %}
+        <div class="text-center" style="margin-top: 1rem;">
+          <a href="{{ url_for('goals_dashboard') }}" class="btn">View All {{ goals|length }} Goals</a>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  {% if completed_goals %}
+    <section class="goals-overview completed-goals-overview">
+      <div class="section-header">
+        <h2>Previously Completed Goals</h2>
+        <a href="{{ url_for('goals_dashboard') }}#completed" class="btn-link">View All →</a>
+      </div>
+      <div class="goal-preview-grid">
+        {% for goal in completed_goals %}
+        <a href="{{ url_for('goal_view', goal_id=goal.id) }}" class="goal-preview-card completed-preview-card">
+          <h3>{{ goal.goal_name }}</h3>
+          <div class="progress-track-small">
+            <div class="progress-bar" style="width: 100%"></div>
+          </div>
+          <div class="goal-preview-stats">
+            <span>€{{ "%.2f"|format(goal.saved_amount) }} / €{{ "%.2f"|format(goal.target_amount) }}</span>
+            <strong>100%</strong>
+          </div>
+          <span class="completed-badge">Completed</span>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if not goals and not completed_goals %}
+    <div class="card empty-state">
+      <h3>No savings goals yet</h3>
+      <p>Start by creating your first savings goal. We'll help you track progress and stay on target.</p>
+      <a class="btn" href="{{ url_for('goal_new') }}">Create your first goal</a>
+    </div>
+  {% endif %}
+
+  {% if current_user.is_admin %}
+    <div style="margin-top: 2rem;">
+      <a class="btn secondary" href="{{ url_for('users') }}">Admin: Manage Users</a>
+    </div>
+  {% endif %}
+
+{% else %}
+  <div class="landing-hero">
+    <h1>Welcome to FYP Savings</h1>
+    <p class="hero-subtitle">Track your savings goals, set targets, and achieve your financial dreams.</p>
+    <div class="hero-features">
+      <div class="feature">
+        <h3>📊 Track Progress</h3>
+        <p>Monitor your savings with real-time progress tracking</p>
+      </div>
+      <div class="feature">
+        <h3>🔔 Smart Notifications</h3>
+        <p>Get reminders for payments and celebrate milestones</p>
+      </div>
+      <div class="feature">
+        <h3>💰 Goal Management</h3>
+        <p>Create multiple goals and manage them all in one place</p>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <a class="btn" href="{{ url_for('signup') }}">Get Started</a>
+      <a class="btn secondary" href="{{ url_for('login') }}">Log In</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

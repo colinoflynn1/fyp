@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Settings</h1>
+    <p>Manage your account preferences and notification settings.</p>
+  </div>
+</section>
+
+<div class="settings-container">
+  <div class="settings-section">
+    <h2>Notification Preferences</h2>
+    <p class="settings-description">
+      Choose how you want to receive notifications about your savings goals.
+    </p>
+    
+    <form method="post" action="{{ url_for('settings') }}">
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            name="email_notifications"
+            {% if user.email_notifications %}checked{% endif %}
+          >
+          <span>Email Notifications</span>
+        </label>
+        <p class="form-help">
+          Receive email notifications for payment reminders and milestone achievements.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            name="dashboard_notifications"
+            {% if user.dashboard_notifications %}checked{% endif %}
+          >
+          <span>Dashboard Notifications</span>
+        </label>
+        <p class="form-help">
+          Show notifications on your dashboard when you log in.
+        </p>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Save Preferences</button>
+        <a href="{{ url_for('home') }}" class="btn secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="settings-section">
+    <h2>Account Information</h2>
+    <dl class="account-info">
+      <div>
+        <dt>Full Name</dt>
+        <dd>{{ user.full_name }}</dd>
+      </div>
+      <div>
+        <dt>Email</dt>
+        <dd>{{ user.email }}</dd>
+      </div>
+      <div>
+        <dt>Role</dt>
+        <dd>{{ user.role|title }}</dd>
+      </div>
+      <div>
+        <dt>Member Since</dt>
+        <dd>{{ user.created_at.strftime("%d %b %Y") }}</dd>
+      </div>
+    </dl>
+  </div>
+
+  <div class="settings-section">
+    <h2>Password</h2>
+    <p>To change your password, use the password reset feature.</p>
+    <a href="{{ url_for('forgot') }}" class="btn secondary">Reset Password</a>
+  </div>
+</div>
+{% endblock %}

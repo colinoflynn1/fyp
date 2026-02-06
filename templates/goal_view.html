@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <a href="{{ url_for('goals_dashboard') }}" class="link-muted">← Back to Savings</a>
+    <h1>{{ goal.goal_name }}</h1>
+    {% if is_completed %}
+      <p class="goal-view-badge completed">Completed {{ goal.completed_at.strftime("%d %b %Y") if goal.completed_at else '' }}</p>
+    {% else %}
+      <p>Saving {{ goal.frequency.replace('-', ' ') }} until {{ goal.target_date.strftime("%d %b %Y") }}</p>
+    {% endif %}
+  </div>
+  {% if not is_completed %}
+    <div>
+      <a class="btn" href="{{ url_for('goal_edit', goal_id=goal.id) }}">Edit goal</a>
+      <form method="post" action="{{ url_for('goal_delete', goal_id=goal.id) }}" style="display: inline;" onsubmit="return confirm('Delete this goal?');">
+        <button type="submit" class="btn danger">Delete</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+
+<article class="goal-card goal-view-card">
+  <div class="progress-track">
+    <div class="progress-bar" style="width: {{ goal.percent_complete }}%"></div>
+  </div>
+  <p class="goal-view-percent">{{ "%.0f"|format(goal.percent_complete) }}% complete</p>
+
+  <dl class="goal-stats goal-view-stats">
+    <div>
+      <dt>Target</dt>
+      <dd>€{{ "%.2f"|format(goal.target_amount) }}</dd>
+    </div>
+    <div>
+      <dt>Saved</dt>
+      <dd>€{{ "%.2f"|format(goal.saved_amount) }}</dd>
+    </div>
+    <div>
+      <dt>Remaining</dt>
+      <dd>€{{ "%.2f"|format(goal.remaining) }}</dd>
+    </div>
+    {% if not is_completed %}
+    <div>
+      <dt>Days left</dt>
+      <dd>{{ goal.days_left }}</dd>
+    </div>
+    <div>
+      <dt>Per period</dt>
+      <dd>€{{ "%.2f"|format(goal.recommended_contribution) }}</dd>
+    </div>
+    {% endif %}
+    <div>
+      <dt>Created</dt>
+      <dd>{{ goal.created_at.strftime("%d %b %Y") if goal.created_at else '-' }}</dd>
+    </div>
+  </dl>
+
+  {% if not is_completed and goal.next_due_date %}
+  <div class="goal-next {{ 'overdue' if goal.is_due else '' }}">
+    <p class="goal-next-label">Next due: {{ goal.next_due_date.strftime("%d %b %Y") }}</p>
+    <p class="goal-next-amount">Suggested: €{{ "%.2f"|format(goal.recommended_contribution) }}</p>
+  </div>
+  <div class="goal-deposit">
+    <h4>Add lump sum</h4>
+    <form method="post" action="{{ url_for('goal_deposit', goal_id=goal.id) }}">
+      <div class="inline-fields">
+        <input type="number" name="amount" min="0" step="10.00" placeholder="Amount (€)" required>
+        <input type="text" name="note" placeholder="Note (optional)">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="goal-history">
+    <h4>Deposit history</h4>
+    {% if goal.deposits %}
+    <ul>
+      {% for deposit in goal.deposits %}
+      <li>
+        <span>{{ deposit.created_at.strftime("%d %b %Y") }}</span>
+        <span>€{{ "%.2f"|format(deposit.amount) }}</span>
+        {% if deposit.note %}<span class="deposit-note">{{ deposit.note }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No deposits yet.</p>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}

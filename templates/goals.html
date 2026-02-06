@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Savings goals</h1>
+    <p>Create targets, add lump sums, and watch your progress.</p>
+  </div>
+  <a class="btn" href="{{ url_for('goal_new') }}">New goal</a>
+</section>
+
+{% if goals %}
+  <div class="goal-grid">
+    {% for goal in goals %}
+      <article class="goal-card">
+        <header>
+          <div>
+            <h3>{{ goal.goal_name }}</h3>
+            <p>Saving {{ goal.frequency.replace('-', ' ') }} until {{ goal.target_date.strftime("%d %b %Y") }}</p>
+          </div>
+          <strong>{{ "%.0f"|format(goal.percent_complete) }}%</strong>
+        </header>
+        <div class="progress-track">
+          <div class="progress-bar" style="width: {{ goal.percent_complete }}%"></div>
+        </div>
+
+        <dl class="goal-stats">
+          <div>
+            <dt>Target</dt>
+            <dd>€{{ "%.2f"|format(goal.target_amount) }}</dd>
+          </div>
+          <div>
+            <dt>Saved</dt>
+            <dd>€{{ "%.2f"|format(goal.saved_amount) }}</dd>
+          </div>
+          <div>
+            <dt>Remaining</dt>
+            <dd>€{{ "%.2f"|format(goal.remaining) }}</dd>
+          </div>
+          <div>
+            <dt>Days left</dt>
+            <dd>{{ goal.days_left }}</dd>
+          </div>
+          <div>
+            <dt>Periods left</dt>
+            <dd>{{ goal.periods_left }}</dd>
+          </div>
+          <div>
+            <dt>Per period</dt>
+            <dd>€{{ "%.2f"|format(goal.recommended_contribution) }}</dd>
+          </div>
+        </dl>
+
+        <div class="goal-actions">
+          <a class="btn secondary" href="{{ url_for('goal_view', goal_id=goal.id) }}">View</a>
+          <a class="btn secondary" href="{{ url_for('goal_edit', goal_id=goal.id) }}">Edit goal</a>
+          <form method="post" action="{{ url_for('goal_delete', goal_id=goal.id) }}" onsubmit="return confirm('Delete this goal?');">
+            <button type="submit" class="btn danger">Delete</button>
+          </form>
+        </div>
+
+        <div class="goal-deposit">
+          <h4>Add lump sum</h4>
+          <form method="post" action="{{ url_for('goal_deposit', goal_id=goal.id) }}">
+            <div class="inline-fields">
+              <input
+                type="number"
+                name="amount"
+                min="0"
+                step="10.00"
+                placeholder="Amount (€)"
+                required
+              >
+              <input
+                type="text"
+                name="note"
+                placeholder="Note (optional)"
+              >
+              <button type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+
+        {% if goal.next_due_date %}
+          <div class="goal-next {{ 'overdue' if goal.is_due else '' }}">
+            <p class="goal-next-label">
+              {% if goal.is_due %}
+                Contribution overdue since {{ goal.next_due_date.strftime("%d %b %Y") }}
+              {% else %}
+                Next contribution due on {{ goal.next_due_date.strftime("%d %b %Y") }}
+              {% endif %}
+            </p>
+            <p class="goal-next-amount">
+              Suggested {{ goal.frequency.replace('-', ' ') }} amount:
+              €{{ "%.2f"|format(goal.recommended_contribution) }}
+            </p>
+          </div>
+
+          {% if goal.is_due %}
+            <div class="goal-due-actions">
+              <form method="post" action="{{ url_for('goal_auto_contribute', goal_id=goal.id) }}">
+                <button type="submit" class="btn">
+                  Yes, I contributed €{{ "%.2f"|format(goal.recommended_contribution) }}
+                </button>
+              </form>
+              <form method="post" action="{{ url_for('goal_skip_period', goal_id=goal.id) }}">
+                <button type="submit" class="btn secondary">
+                  Skip this period
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        {% endif %}
+
+        {% if goal.recent_deposits %}
+          <div class="goal-history">
+            <h4>Recent deposits</h4>
+            <ul>
+              {% for deposit in goal.recent_deposits %}
+                <li>
+                  <span>{{ deposit.created_at.strftime("%d %b") }}</span>
+                  <span>€{{ "%.2f"|format(deposit.amount) }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card empty-state">
+    <h3>{% if completed_goals %}No active savings goals{% else %}No savings goals yet{% endif %}</h3>
+    <p>{% if completed_goals %}Create a new goal or view your completed goals below.{% else %}Start by setting a target amount and timeline. We'll do the maths for you.{% endif %}</p>
+    <a class="btn" href="{{ url_for('goal_new') }}">{% if completed_goals %}New goal{% else %}Create your first goal{% endif %}</a>
+  </div>
+{% endif %}
+
+{% if completed_goals %}
+<section id="completed" class="completed-goals-section">
+  <h2>Previously Completed Goals</h2>
+  <div class="goal-grid completed-goals-grid">
+    {% for goal in completed_goals %}
+    <a href="{{ url_for('goal_view', goal_id=goal.id) }}" class="goal-card completed-goal-card">
+      <header>
+        <div>
+          <h3>{{ goal.goal_name }}</h3>
+          <p>Completed {{ goal.completed_at.strftime("%d %b %Y") if goal.completed_at else '' }}</p>
+        </div>
+        <span class="completed-badge">100%</span>
+      </header>
+      <div class="progress-track">
+        <div class="progress-bar" style="width: 100%"></div>
+      </div>
+      <dl class="goal-stats">
+        <div>
+          <dt>Target</dt>
+          <dd>€{{ "%.2f"|format(goal.target_amount) }}</dd>
+        </div>
+        <div>
+          <dt>Saved</dt>
+          <dd>€{{ "%.2f"|format(goal.saved_amount) }}</dd>
+        </div>
+      </dl>
+      <span class="view-link">View details →</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+

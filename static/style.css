@@ -1,0 +1,739 @@
+/* All Style code from W3schools - https://www.w3schools.com/css/default.asp
+
+ */
+:root {
+  --bg: #ffffff;
+  --text: #111111;
+  --muted: #555555;
+  --accent: #0071e3;
+  --error: #ff3b30;
+  --success: #34c759;
+  --radius: 12px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.06);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+.btn, button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+.btn:hover, button:hover { background: #005bb5; }
+
+input, select {
+  border: 1px solid #ddd;
+  border-radius: var(--radius);
+  padding: 0.6rem;
+  width: 100%;
+  font-size: 1rem;
+}
+label { display: block; margin-bottom: 0.4rem; color: var(--muted); }
+
+form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: #fff;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.page-header p {
+  color: var(--muted);
+  margin: 0.2rem 0 0;
+}
+
+.link-muted {
+  color: var(--muted);
+}
+
+.btn.secondary {
+  background: #f5f7fb;
+  color: var(--text);
+}
+.btn.secondary:hover {
+  background: #e4e9f2;
+}
+.btn.danger {
+  background: var(--error);
+}
+.btn.danger:hover {
+  background: #d32f2f;
+}
+
+.flash {
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+.flash.success { background: #e9f9ed; color: var(--success); }
+.flash.error { background: #ffecec; color: var(--error); }
+.flash.info { background: #f0f4ff; color: var(--accent); }
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+nav a.logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+nav .links a {
+  margin-left: 1.5rem;
+  font-weight: 500;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+th, td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+th { background: #fafafa; font-weight: 600; }
+
+.actions a, .actions form {
+  display: inline-block;
+  margin-right: 0.3rem;
+}
+.actions button {
+  background: var(--error);
+}
+.actions button:hover {
+  background: #d32f2f;
+}
+
+.goal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+.goal-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.goal-card header p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.progress-track {
+  height: 8px;
+  background: #f2f2f2;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+}
+
+.goal-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+}
+.goal-stats dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+.goal-stats dd {
+  font-weight: 600;
+  margin: 0;
+}
+
+.goal-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+.goal-actions form {
+  margin: 0;
+}
+
+.goal-deposit h4,
+.goal-history h4 {
+  margin: 0 0 0.5rem;
+}
+
+.inline-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+.inline-fields button {
+  width: 100%;
+}
+
+.goal-history ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.goal-history li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.95rem;
+}
+.goal-history li:last-child {
+  border-bottom: none;
+}
+
+.empty-state {
+  text-align: center;
+}
+
+.goal-next {
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: #f4f8ff;
+  border: 1px solid #dbe8ff;
+}
+.goal-next.overdue {
+  background: #fff5f5;
+  border-color: #ffdada;
+}
+.goal-next-label {
+  margin: 0;
+  font-weight: 600;
+}
+.goal-next-amount {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+}
+
+.goal-due-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.goal-due-actions form {
+  margin: 0;
+}
+
+/* Dashboard Styles */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.dashboard-header .subtitle {
+  color: var(--muted);
+  margin: 0.3rem 0 0;
+}
+.dashboard-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.stat-card h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.3rem 0;
+  color: var(--accent);
+}
+.stat-subtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0.3rem 0 0;
+}
+
+.notifications-section {
+  margin-bottom: 2rem;
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.section-header h2 {
+  margin: 0;
+}
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  text-decoration: underline;
+}
+.btn-link:hover {
+  color: #005bb5;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.notification-item {
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border-left: 4px solid var(--accent);
+}
+.notification-item.milestone {
+  border-left-color: var(--success);
+  background: #f0fdf4;
+}
+.notification-item.payment-due {
+  border-left-color: #ff9800;
+  background: #fffbf0;
+}
+.notification-content {
+  flex: 1;
+}
+.notification-content h4 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+}
+.notification-content p {
+  margin: 0.3rem 0;
+  color: var(--muted);
+}
+.notification-time {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.goals-overview {
+  margin-bottom: 2rem;
+}
+.goal-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+.goal-preview-card {
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-left: 4px solid var(--accent);
+}
+.goal-preview-card.overdue {
+  border-left-color: var(--error);
+  background: #fff5f5;
+}
+.goal-preview-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.progress-track-small {
+  height: 6px;
+  background: #f2f2f2;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.goal-preview-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.goal-preview-stats strong {
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+.due-badge {
+  margin: 0;
+  padding: 0.3rem 0.6rem;
+  background: var(--error);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: inline-block;
+}
+
+/* Completed goals */
+.completed-badge {
+  margin: 0;
+  padding: 0.3rem 0.6rem;
+  background: var(--success);
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: inline-block;
+}
+.completed-goals-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+.completed-goals-section h2 {
+  margin: 0 0 1rem;
+}
+.completed-goal-card {
+  text-decoration: none;
+  color: inherit;
+  border-left-color: var(--success);
+  background: #f0fdf4;
+}
+.completed-goal-card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+.completed-goal-card .view-link {
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+.completed-preview-card {
+  text-decoration: none;
+  color: inherit;
+  border-left-color: var(--success);
+  background: #f0fdf4;
+}
+.completed-preview-card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+.notification-item.goal-completed {
+  border-left-color: var(--success);
+  background: #f0fdf4;
+}
+.goal-view-card {
+  margin-top: 1rem;
+}
+.goal-view-badge.completed {
+  color: var(--success);
+  font-weight: 600;
+}
+.goal-view-percent {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+.goal-view-stats {
+  margin-top: 1rem;
+}
+.deposit-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.landing-hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: var(--muted);
+  margin-bottom: 3rem;
+}
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+.hero-features .feature h3 {
+  margin-bottom: 0.5rem;
+}
+.hero-features .feature p {
+  color: var(--muted);
+}
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* Settings Styles */
+.settings-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.settings-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.settings-description {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+}
+.form-help {
+  margin: 0.3rem 0 0 1.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.account-info {
+  display: grid;
+  gap: 1rem;
+}
+.account-info > div {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+.account-info > div:last-child {
+  border-bottom: none;
+}
+.account-info dt {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+.account-info dd {
+  font-weight: 600;
+  margin: 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Chat page - AI Chatbot styles
+   Reference: W3Schools CSS - https://www.w3schools.com/css/default.asp
+   Reference: Flexbox - https://www.w3schools.com/css/css3_flexbox.asp
+   Reference: CSS Grid - https://www.w3schools.com/css/css_grid.asp
+   Chat UI pattern: message bubbles, form layout, confirmation card
+*/
+.chat-page {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.chat-header {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.chat-header h1 {
+  margin: 0 0 0.4rem;
+}
+.chat-subtitle {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+.chat-container {
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+}
+.chat-messages {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.chat-message {
+  display: flex;
+  align-items: flex-start;
+}
+.chat-message.user {
+  justify-content: flex-end;
+}
+.chat-message .message-bubble {
+  max-width: 85%;
+  padding: 0.9rem 1.2rem;
+  border-radius: var(--radius);
+  line-height: 1.5;
+}
+.chat-message.assistant .message-bubble {
+  background: #f4f8ff;
+  border: 1px solid #dbe8ff;
+}
+.chat-message.user .message-bubble {
+  background: var(--accent);
+  color: #fff;
+}
+.chat-message .message-bubble p {
+  margin: 0;
+  white-space: pre-line;
+}
+.chat-message .message-bubble a {
+  color: inherit;
+  text-decoration: underline;
+}
+.chat-form {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #eee;
+  margin: 0;
+}
+.chat-form input {
+  flex: 1;
+  margin: 0;
+}
+.chat-form button {
+  flex-shrink: 0;
+}
+.goal-confirm-card {
+  padding: 1.5rem;
+  margin: 0 1.5rem 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius);
+}
+.goal-confirm-card h3 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+.goal-confirm-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 1.5rem;
+  margin-bottom: 1rem;
+}
+.goal-confirm-details dt {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0;
+}
+.goal-confirm-details dd {
+  margin: 0;
+  font-weight: 600;
+}
+.goal-confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.goal-confirm-actions form {
+  margin: 0;
+}
+.error-text {
+  color: var(--error);
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}

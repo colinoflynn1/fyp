@@ -1,0 +1,182 @@
+{# Reference: Jinja2 Template Inheritance - https://jinja.palletsprojects.com/en/3.1.x/templates/#template-inheritance #}
+{% extends "base.html" %}
+{% block content %}
+{# Reference: W3Schools HTML structure - https://www.w3schools.com/html/default.asp #}
+{# Reference: Chat UI pattern - form, fetch API for async messaging #}
+<div class="chat-page">
+  <div class="chat-header">
+    <div>
+      <h1>Savings Advisor</h1>
+      <p class="chat-subtitle">Ask for savings advice based on your budget. I can suggest goals and create them for you—you'll always confirm before anything is created.</p>
+    </div>
+    <button type="button" class="btn secondary btn-small" id="btn-clear-chat" title="Start a fresh conversation">Clear chat</button>
+  </div>
+
+  <div class="chat-container">
+    <div id="chat-messages" class="chat-messages">
+      <div class="chat-message assistant">
+        <div class="message-bubble">
+          <p>Hi! I'm your savings advisor. Tell me about your budget and how often you can save (weekly, bi-weekly, or monthly), and I'll give you personalized advice. I can also suggest and create savings goals—I'll always show you a summary and wait for your confirmation first.</p>
+        </div>
+      </div>
+      {# Reference: Jinja2 for loop - https://jinja.palletsprojects.com/en/3.1.x/templates/#for #}
+      {# Reference: Jinja2 escape filter |e - https://jinja.palletsprojects.com/en/3.1.x/templates/#jinja-filters.escape #}
+      {% for msg in chat_history %}
+      <div class="chat-message {{ msg.role }}">
+        <div class="message-bubble">
+          <p>{{ msg.content | e }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div id="goal-confirm-card" class="goal-confirm-card" style="display: none;">
+      <h3>Create this goal?</h3>
+      <dl class="goal-confirm-details">
+        <dt>Goal</dt>
+        <dd id="cf-goal-name"></dd>
+        <dt>Target</dt>
+        <dd id="cf-target"></dd>
+        <dt>Contributions</dt>
+        <dd id="cf-frequency"></dd>
+        <dt>Target date</dt>
+        <dd id="cf-date"></dd>
+      </dl>
+      <div class="goal-confirm-actions">
+        <button type="button" class="btn" id="btn-confirm-create">Create goal</button>
+        <button type="button" class="btn secondary" id="btn-cancel-goal">Cancel</button>
+      </div>
+      <p id="goal-confirm-error" class="error-text" style="display: none;"></p>
+    </div>
+
+    <form id="chat-form" class="chat-form">
+      <input type="text" id="chat-input" placeholder="Type your message..." autocomplete="off" />
+      <button type="submit" class="btn" id="btn-send">Send</button>
+    </form>
+  </div>
+</div>
+
+{# Reference: Fetch API - https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API #}
+{# Reference: DOM manipulation - https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model #}
+{# Reference: addEventListener - https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener #}
+<script>
+(function() {
+  const messagesEl = document.getElementById('chat-messages');
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('chat-input');
+  const btnSend = document.getElementById('btn-send');
+  const confirmCard = document.getElementById('goal-confirm-card');
+  const btnConfirm = document.getElementById('btn-confirm-create');
+  const btnCancel = document.getElementById('btn-cancel-goal');
+  const btnClearChat = document.getElementById('btn-clear-chat');
+  const cfError = document.getElementById('goal-confirm-error');
+
+  function addMessage(role, content) {
+    const div = document.createElement('div');
+    div.className = 'chat-message ' + role;
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    bubble.innerHTML = '<p>' + content.replace(/\n/g, '<br>') + '</p>';
+    div.appendChild(bubble);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showConfirmCard(goal) {
+    document.getElementById('cf-goal-name').textContent = goal.goal_name;
+    document.getElementById('cf-target').textContent = '€' + parseFloat(goal.target_amount).toFixed(2);
+    document.getElementById('cf-frequency').textContent = goal.frequency;
+    document.getElementById('cf-date').textContent = goal.target_date;
+    cfError.style.display = 'none';
+    cfError.textContent = '';
+    confirmCard.style.display = 'block';
+  }
+
+  function hideConfirmCard() {
+    confirmCard.style.display = 'none';
+  }
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessage('user', msg);
+    input.value = '';
+    btnSend.disabled = true;
+
+    try {
+      const res = await fetch('{{ url_for("chat_message") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      });
+      const data = await res.json();
+
+      if (!data.ok) {
+        addMessage('assistant', 'Sorry, something went wrong: ' + (data.error || 'Unknown error'));
+        return;
+      }
+
+      addMessage('assistant', data.response);
+
+      if (data.proposed_goal) {
+        showConfirmCard(data.proposed_goal);
+      }
+    } catch (err) {
+      addMessage('assistant', 'Sorry, I could not reach the server. Please try again.');
+    } finally {
+      btnSend.disabled = false;
+    }
+  });
+
+  btnConfirm.addEventListener('click', async function() {
+    btnConfirm.disabled = true;
+    cfError.style.display = 'none';
+    try {
+      const res = await fetch('{{ url_for("chat_confirm_goal") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        hideConfirmCard();
+        addMessage('assistant', 'Goal created! You can view it on your Savings page.');
+        addMessage('assistant', '<a href="{{ url_for("goals_dashboard") }}">View your goals →</a>');
+      } else {
+        cfError.textContent = data.error || 'Could not create goal.';
+        cfError.style.display = 'block';
+      }
+    } catch (err) {
+      cfError.textContent = 'Request failed. Please try again.';
+      cfError.style.display = 'block';
+    } finally {
+      btnConfirm.disabled = false;
+    }
+  });
+
+  btnCancel.addEventListener('click', async function() {
+    try {
+      const res = await fetch('{{ url_for("chat_cancel_goal") }}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      const data = await res.json();
+      if (data.ok && data.message) {
+        addMessage('assistant', data.message);
+      }
+    } catch (_) {}
+    hideConfirmCard();
+  });
+
+  btnClearChat.addEventListener('click', async function() {
+    if (!confirm('Start a fresh conversation? This will clear the chat history.')) return;
+    try {
+      await fetch('{{ url_for("chat_clear") }}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      messagesEl.innerHTML = '';
+      addMessage('assistant', "Hi! I'm your savings advisor. Tell me about your budget and how often you can save (weekly, bi-weekly, or monthly), and I'll give you personalized advice. I can also suggest and create savings goals—I'll always show you a summary and wait for your confirmation first.");
+      hideConfirmCard();
+    } catch (_) {}
+  });
+})();
+</script>
+{% endblock %}
