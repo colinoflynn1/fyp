@@ -30,6 +30,7 @@ from goals import (
     build_progress as build_goal_progress,
     skip_next_due,
     mark_goal_completed_if_done,
+    get_contribution_insights,
 )
 from notifications import (
     list_notifications,
@@ -405,6 +406,22 @@ def goals_dashboard():
     )
 
 
+# Reference: Chart.js Documentation - https://www.chartjs.org/docs/latest/
+# Reference: W3Schools Chart.js - https://www.w3schools.com/js/js_graphics_chartjs.asp
+# Insights page - pie chart showing contribution breakdown (on-time, lump sums, skips).
+@app.route("/insights")
+@login_required
+def insights():
+    data = get_contribution_insights(current_user.id)
+    return render_template(
+        "insights.html",
+        title="Contribution Insights",
+        on_time=data["on_time"],
+        lump_sum=data["lump_sum"],
+        skips=data["skips"],
+    )
+
+
 # Reference: Flask variable rules - https://flask.palletsprojects.com/en/3.0.x/quickstart/#variable-rules
 # Reference: get_user_goal, build_goal_progress, list_goal_deposits from goals.py (project-internal)
 @app.route("/goals/<int:goal_id>")
@@ -585,7 +602,13 @@ def goal_deposit(goal_id: int):
         flash("Deposit must be positive.", "error")
         return redirect(url_for("goals_dashboard"))
 
-    if add_goal_deposit(goal_id, user_id=current_user.id, amount=amount, note=note):
+    if add_goal_deposit(
+        goal_id,
+        user_id=current_user.id,
+        amount=amount,
+        note=note,
+        contribution_type="lump_sum",
+    ):
         # Reference: Completed goals - mark_goal_completed_if_done from goals.py; create_notification, send_goal_completed_email
         user = get_user_by_id(current_user.id)
         if mark_goal_completed_if_done(goal_id, current_user.id):
@@ -649,6 +672,7 @@ def goal_auto_contribute(goal_id: int):
         user_id=current_user.id,
         amount=amount,
         note=f"Scheduled {goal.get('frequency', 'periodic')} contribution",
+        contribution_type="on_time",
     ):
         # Reference: Completed goals - mark_goal_completed_if_done from goals.py; create_notification, send_goal_completed_email
         user = get_user_by_id(current_user.id)
@@ -686,19 +710,19 @@ def goal_auto_contribute(goal_id: int):
 
 
 # Reference: Based on Flask doc + based on chatgpt chat in documentation.
-# Moves the next contribution date forward without adding funds.
+# Moves the next contribution date forward and updates amount
 @app.route("/goals/<int:goal_id>/skip-period", methods=["POST"])
 @login_required
 def goal_skip_period(goal_id: int):
     next_due = skip_next_due(goal_id, user_id=current_user.id)
     if not next_due:
         flash("Goal not found.", "error")
-    else:
-        flash(
-            f"Next contribution moved to {next_due.strftime('%d %b %Y')}.",
-            "info",
-        )
-    return redirect(url_for("goals_dashboard"))
+        return redirect(url_for("goals_dashboard"))
+    flash(
+        f"Next contribution moved to {next_due.strftime('%d %b %Y')}. Suggested amount updated.",
+        "info",
+    )
+    return redirect(url_for("goal_view", goal_id=goal_id))
 
 
 # Reference: Based on Flask Documentation - Request Data 
@@ -788,7 +812,7 @@ def chat_page():
     return render_template("chat.html", title="Savings Advisor", chat_history=chat_history)
 
 
-# Reference: Based on Flask Request - get_json
+# Reference: https://claude.ai/share/d693c4c8-3935-4cb1-8b10-57738b6c3e36
 # https://flask.palletsprojects.com/en/3.0.x/api/#flask.Request.get_json
 # Reference: Based on Flask jsonify - https://flask.palletsprojects.com/en/3.0.x/api/#flask.json.jsonify
 # AI Chatbot: Send message and get AI response

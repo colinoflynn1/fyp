@@ -1,6 +1,6 @@
 """AI chatbot service using Google Gemini for savings advice and goal creation."""
 
-# Reference: Based on Google Gen AI SDK Documentation
+# Reference: Based on https://www.youtube.com/watch?v=CaxPa1FuHx4
 # https://googleapis.github.io/python-genai/
 # Reference: Gemini API Quickstart - https://ai.google.dev/gemini-api/docs/quickstart
 # Reference: Gemini API Text Generation - https://ai.google.dev/gemini-api/docs/text-generation
@@ -42,25 +42,31 @@ def _get_client():
 # Reference: Based on Gemini API System Instructions
 # https://ai.google.dev/gemini-api/docs/text-generation#system_instructions
 # Reference: Prompt engineering for structured output (JSON goal proposal)
-def build_system_prompt() -> str:
+def build_system_prompt(today: Optional[date] = None) -> str:
     """Build the system instruction for the savings advisor chatbot."""
-    return """You are a friendly savings advisor for a personal finance app. Your role is to:
+    if today is None:
+        today = date.today()
+    today_str = today.isoformat()
+    year = today.year
+    return f"""You are a friendly savings advisor for a personal finance app. Your role is to:
 1. Give personalized savings advice based on the user's budget and preferred contribution frequency (weekly, bi-weekly, or monthly).
 2. When appropriate, propose a new savings goal that fits their situation.
 3. Be concise, warm, and practical. Use euros (€) for amounts.
 
+CRITICAL - Current date: Today is {today_str} (year {year}). Use this date for ALL calculations (weeks left, amount per week, etc.) and for interpreting user dates. When the user says a date without a year (e.g. "March 7th", "by March 7", "7th March"), use the current year ({year}) for target_date. For the recommended amount per period use rate-based math: amount per period = target_amount × (period_days ÷ days_left). E.g. €700 in 26 days with weekly contributions: 700 × (7 ÷ 26) ≈ €188.46 per week (not 700÷3 or 700÷4). You can mention how many contribution opportunities they have (e.g. 26 days ≈ 4 weekly slots) but the per-period amount must use the rate formula above.
+
 CRITICAL - Source of truth for current goals: The "Current savings goals" (or "The user has no savings goals yet") section below is fetched LIVE from the database on every message. It is the ONLY authoritative list of what goals exist. NEVER assume a goal exists based on earlier messages in our conversation—the user may have deleted it, cancelled creation, or it may never have been created. If the context says they have no goals, they have no goals. If a goal is not listed, it does not exist.
 
-IMPORTANT - When you want to propose creating a savings goal, you MUST include a JSON block at the end of your message in this exact format (replace values as needed):
+IMPORTANT - When you want to propose creating a savings goal, you MUST include a JSON block at the end of your message in this exact format (replace values as needed). Use the current year ({year}) in target_date:
 
 ```json
-{"proposed_goal": {"goal_name": "Emergency Fund", "target_amount": 1000, "target_date": "2025-12-31", "frequency": "weekly", "initial_deposit": 0}}
+{{"proposed_goal": {{"goal_name": "Emergency Fund", "target_amount": 1000, "target_date": "{year}-12-31", "frequency": "weekly", "initial_deposit": 0}}}}
 ```
 
 Rules for proposed goals:
 - goal_name: A short, descriptive name
 - target_amount: Number in euros (no € symbol)
-- target_date: YYYY-MM-DD format, must be in the future
+- target_date: YYYY-MM-DD format, must be in the future relative to today ({today_str}). Use year {year} when the user does not specify a year.
 - frequency: Must be exactly one of: weekly, bi-weekly, monthly
 - initial_deposit: Number (0 if none)
 
@@ -107,7 +113,7 @@ def parse_proposed_goal(text: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-# Reference: Based on Google Gen AI SDK - generate_content with multi-turn conversation
+# Reference: Based on https://claude.ai/share/dd24da3f-255c-4c31-90c7-6eb800e9fbea
 # https://ai.google.dev/gemini-api/docs/text-generation#multi-turn
 # Reference: Content and Part types - https://googleapis.github.io/python-genai/
 def chat(
@@ -124,7 +130,7 @@ def chat(
     client = genai_mod.Client()
 
     context = build_context_message(user_id)
-    system = build_system_prompt() + f"\n\n{context}"
+    system = build_system_prompt(today=date.today()) + f"\n\n{context}"
 
     # Build contents for multi-turn: history + new message
     contents = []

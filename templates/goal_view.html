@@ -59,6 +59,16 @@
   <div class="goal-next {{ 'overdue' if goal.is_due else '' }}">
     <p class="goal-next-label">Next due: {{ goal.next_due_date.strftime("%d %b %Y") }}</p>
     <p class="goal-next-amount">Suggested: €{{ "%.2f"|format(goal.recommended_contribution) }}</p>
+    {% if goal.is_due %}
+    <div class="goal-due-actions" style="margin-top: 0.75rem;">
+      <form method="post" action="{{ url_for('goal_auto_contribute', goal_id=goal.id) }}" style="display: inline;">
+        <button type="submit" class="btn">I contributed €{{ "%.2f"|format(goal.recommended_contribution) }}</button>
+      </form>
+      <form method="post" action="{{ url_for('goal_skip_period', goal_id=goal.id) }}" style="display: inline;">
+        <button type="submit" class="btn secondary">Skip this period</button>
+      </form>
+    </div>
+    {% endif %}
   </div>
   <div class="goal-deposit">
     <h4>Add lump sum</h4>

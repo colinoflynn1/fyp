@@ -1,0 +1,71 @@
+
+{% extends "base.html" %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h1>Contribution insights</h1>
+  </div>
+</section>
+
+{% set total = on_time + lump_sum + skips %}
+{% if total == 0 %}
+  <div class="card" style="text-align: center; padding: 2rem;">
+    <p class="muted">No contribution data yet. Add deposits or skip periods on your goals to see insights here.</p>
+    <a class="btn" href="{{ url_for('goals_dashboard') }}">Go to Savings</a>
+  </div>
+{% else %}
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <h2 style="margin-top: 0;">Contribution breakdown</h2>
+    <div style="max-width: 320px; margin: 0 auto 1rem;">
+      <canvas id="contribChart" width="300" height="300"></canvas>
+    </div>
+    <ul class="insights-legend" style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+      <li><span class="legend-dot" style="background: #34c759;"></span> On time (suggested amount): {{ on_time }}</li>
+      <li><span class="legend-dot" style="background: #0071e3;"></span> Lump sums (initial + extra): {{ lump_sum }}</li>
+      <li><span class="legend-dot" style="background: #ff9500;"></span> Skipped periods: {{ skips }}</li>
+    </ul>
+  </div>
+  <p class="muted" style="font-size: 0.9rem;">
+    On time = you contributed the suggested amount when it was due.<br><br>
+    Lump sums = initial deposit when creating a goal plus any &quot;Add lump sum&quot; during the goal.<br><br>
+    Skips = periods you chose to skip (no money added).
+  </p>
+{% endif %}
+{# Reference: Chart.js CDN via jsDelivr - https://www.jsdelivr.com/package/npm/chart.js #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{# Reference: Chart.js Getting Started - https://www.chartjs.org/docs/latest/getting-started/ #}
+{# Reference: Chart.js Tooltip Callbacks - https://www.chartjs.org/docs/latest/configuration/tooltip.html#tooltip-callbacks #}
+<script>
+(function() {
+  var total = {{ on_time }} + {{ lump_sum }} + {{ skips }};
+  if (total === 0) return;
+  var ctx = document.getElementById('contribChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['On time', 'Lump sums', 'Skips'],
+      datasets: [{
+        data: [{{ on_time }}, {{ lump_sum }}, {{ skips }}],
+        backgroundColor: ['#34c759', '#0071e3', '#ff9500'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var pct = total ? ((ctx.raw / total) * 100).toFixed(0) : 0;
+              return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+</script>
+{% endblock %}

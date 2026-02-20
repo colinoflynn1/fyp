@@ -38,6 +38,17 @@ a {
 }
 a:hover { text-decoration: underline; }
 
+.muted { color: var(--muted); }
+
+.legend-dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 2px;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
 .btn, button {
   background: var(--accent);
   color: #fff;
@@ -736,4 +747,77 @@ th { background: #fafafa; font-weight: 600; }
   color: var(--error);
   font-size: 0.9rem;
   margin: 0.5rem 0 0;
+}
+
+/* Dashboard Layout with Sidebar
+   Reference: MDN CSS Position - https://developer.mozilla.org/en-US/docs/Web/CSS/position
+   Reference: W3Schools Flexbox - https://www.w3schools.com/css/css3_flexbox.asp
+   Reference: MDN Media Queries - https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries
+*/
+.dashboard-layout {
+  position: relative;
+}
+.dashboard-main {
+  width: 100%;
+}
+.savings-tips-sidebar {
+  position: absolute;
+  right: -300px;
+  top: 0;
+  width: 280px;
+}
+.tips-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.tips-box h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+.tips-intro {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+.tips-links {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+.tips-links li {
+  margin-bottom: 0.75rem;
+  padding-left: 1rem;
+  position: relative;
+}
+.tips-links li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+.tips-links a {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  display: block;
+}
+.tips-footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+}
+.tips-footer p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+.tips-footer a {
+  font-weight: 500;
+}
+
+/* Responsive: hide sidebar on smaller screens */
+@media (max-width: 1250px) {
+  .savings-tips-sidebar {
+    display: none;
+  }
 }

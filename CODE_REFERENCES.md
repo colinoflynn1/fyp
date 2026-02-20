@@ -1,4 +1,4 @@
-# Code References Documentation
+
 
 This document lists all references and sources for code sections in this project, organized by file and section. These references are also included as comments in the code files themselves.
 
@@ -232,6 +232,8 @@ This document lists all references and sources for code sections in this project
 - **Pattern**: Mirrors milestone and payment-due notification styling
 
 ## chatbot_service.py (AI Chatbot)
+- **Reference** : https://www.youtube.com/watch?v=CaxPa1FuHx4
+- **Reference** : https://claude.ai/share/dd24da3f-255c-4c31-90c7-6eb800e9fbea
 
 ### Gemini API Integration
 - **Reference**: Based on Google Gen AI SDK Documentation
@@ -275,6 +277,7 @@ This document lists all references and sources for code sections in this project
   - URL: https://flask.palletsprojects.com/en/3.0.x/api/#sessions
 
 ### Chat Message
+- **Reference**: https://claude.ai/share/d693c4c8-3935-4cb1-8b10-57738b6c3e36
 - **Reference**: Based on Flask Request get_json
   - URL: https://flask.palletsprojects.com/en/3.0.x/api/#flask.Request.get_json
 - **Reference**: Based on Flask jsonify
@@ -311,20 +314,18 @@ This document lists all references and sources for code sections in this project
 - **Reference**: Based on Python contextlib.contextmanager
   - URL: https://docs.python.org/3/library/contextlib.html#contextlib.contextmanager
 
-## Summary
+---
 
-All code sections have been referenced to:
-- **Completed Goals (goals.py, app.py, email_service.py, notifications.py, goal_view.html, goals.html, home.html, style.css)**: MySQL ALTER TABLE/UPDATE, CRUD patterns, create_notification, send_goal_completed_email, Flask variable rules, Jinja2, W3Schools
-- **AI Chatbot (chatbot_service.py, app.py, chat.html, style.css)**: Google Gen AI SDK, Gemini API (quickstart, text generation, models, system instructions), Python re/json, Fetch API, Jinja2, W3Schools
-1. Official documentation (Flask, MySQL, Python, Werkzeug, Gmail API)
-2. Standard library patterns (datetime, decimal, contextlib)
-3. Common design patterns (CRUD, form handling, authentication)
-4. Best practices (email templates, notification systems, password security)
-5. **Code reuse patterns within the project** (notifications.py based on user.py and goals.py functions)
+## Iteration 4 – Contribution Insights & Savings Tips
 
-These references ensure:
-- Code is properly attributed
-- Sources are verifiable
-- Patterns follow established best practices
-- All dependencies are documented
-- **Code reuse within the project is clearly documented for audit purposes**
+### Pie Chart (Insights page)
+- **Reference**: Chart.js Documentation – https://www.chartjs.org/docs/latest/
+- **Reference**: W3Schools Chart.js – https://www.w3schools.com/js/js_graphics_chartjs.asp
+- *(Add your AI reference here if used)*
+
+### Savings Tips Sidebar (Home page)
+- **Reference**: MDN CSS Position – https://developer.mozilla.org/en-US/docs/Web/CSS/position
+- **Reference**: MDN aside element – https://developer.mozilla.org/en-US/docs/Web/HTML/Element/aside
+- **Reference**: MDN rel=noopener – https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/noopener
+- *(Add your AI reference here if used)*
+
