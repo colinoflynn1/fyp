@@ -179,29 +179,31 @@ def check_payment_due_notifications(user_id: int) -> List[int]:
             days_until_due = (next_due_date - today).days
             # Notify at 7 days, 2 days, 1 day (tomorrow), and today
             if days_until_due in [7, 2, 1, 0]:
+                amt = float(progress["recommended_contribution"])
+                amt_str = f"{amt:,.2f}"
                 if days_until_due == 0:
                     title = f"Payment Due Today: {goal['goal_name']}"
                     message = (
                         f"Your {goal['goal_name']} goal has a payment due today. "
-                        f"Recommended amount: €{progress['recommended_contribution']:.2f}"
+                        f"Recommended amount: €{amt_str}"
                     )
                 elif days_until_due == 1:
                     title = f"Payment Due Tomorrow: {goal['goal_name']}"
                     message = (
                         f"Your {goal['goal_name']} goal has a payment due tomorrow. "
-                        f"Recommended amount: €{progress['recommended_contribution']:.2f}"
+                        f"Recommended amount: €{amt_str}"
                     )
                 elif days_until_due == 2:
                     title = f"Payment Due in 2 Days: {goal['goal_name']}"
                     message = (
                         f"Your {goal['goal_name']} goal has a payment due in 2 days. "
-                        f"Recommended amount: €{progress['recommended_contribution']:.2f}"
+                        f"Recommended amount: €{amt_str}"
                     )
                 else:  # days_until_due == 7
                     title = f"Payment Due in 7 Days: {goal['goal_name']}"
                     message = (
                         f"Your {goal['goal_name']} goal has a payment due in 7 days. "
-                        f"Recommended amount: €{progress['recommended_contribution']:.2f}"
+                        f"Recommended amount: €{amt_str}"
                     )
                 
                 # Check if notification already exists for this specific day (avoid duplicates)

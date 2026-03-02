@@ -20,7 +20,7 @@
       <div class="stat-card">
         <h3>Total Saved</h3>
         <p class="stat-value">€{{ "%.2f"|format(total_saved) }}</p>
-        <p class="stat-subtitle">of €{{ "%.2f"|format(total_target) }}</p>
+        <p class="stat-subtitle">of €{{ total_target|format_amount }}</p>
       </div>
       <div class="stat-card">
         <h3>Active Goals</h3>
@@ -29,7 +29,7 @@
       </div>
       <div class="stat-card">
         <h3>Remaining</h3>
-        <p class="stat-value">€{{ "%.2f"|format(total_remaining) }}</p>
+        <p class="stat-value">€{{ total_remaining|format_amount }}</p>
         <p class="stat-subtitle">to reach all targets</p>
       </div>
       <div class="stat-card">
@@ -86,13 +86,16 @@
               <div class="progress-bar" style="width: {{ goal.percent_complete }}%"></div>
             </div>
             <div class="goal-preview-stats">
-              <span>€{{ "%.2f"|format(goal.saved_amount) }} / €{{ "%.2f"|format(goal.target_amount) }}</span>
+              <span>€{{ goal.saved_amount|format_amount }} / €{{ goal.target_amount|format_amount }}</span>
               <strong>{{ "%.0f"|format(goal.percent_complete) }}%</strong>
             </div>
             {% if goal.is_due %}
               <p class="due-badge">Due: {{ goal.next_due_date.strftime("%d %b") }}</p>
             {% endif %}
-            <a href="{{ url_for('goals_dashboard') }}" class="btn-small">View Details</a>
+            <div class="goal-preview-actions">
+              <a href="{{ url_for('goals_dashboard') }}" class="btn-small">View Details</a>
+              <a href="{{ url_for('goal_view', goal_id=goal.id) }}?share=1" class="btn share-btn-primary">Share progress</a>
+            </div>
           </div>
         {% endfor %}
       </div>
@@ -112,17 +115,22 @@
       </div>
       <div class="goal-preview-grid">
         {% for goal in completed_goals %}
-        <a href="{{ url_for('goal_view', goal_id=goal.id) }}" class="goal-preview-card completed-preview-card">
-          <h3>{{ goal.goal_name }}</h3>
-          <div class="progress-track-small">
-            <div class="progress-bar" style="width: 100%"></div>
+        <div class="goal-preview-card completed-preview-card">
+          <a href="{{ url_for('goal_view', goal_id=goal.id) }}" class="completed-preview-link">
+            <h3>{{ goal.goal_name }}</h3>
+            <div class="progress-track-small">
+              <div class="progress-bar" style="width: 100%"></div>
+            </div>
+            <div class="goal-preview-stats">
+              <span>€{{ goal.saved_amount|format_amount }} / €{{ goal.target_amount|format_amount }}</span>
+              <strong>100%</strong>
+            </div>
+          </a>
+          <div class="completed-preview-footer">
+            <span class="completed-badge completed-badge-btn-size">Completed</span>
+            <a href="{{ url_for('goal_view', goal_id=goal.id) }}?share=1" class="btn share-btn-primary completed-share-btn">Share</a>
           </div>
-          <div class="goal-preview-stats">
-            <span>€{{ "%.2f"|format(goal.saved_amount) }} / €{{ "%.2f"|format(goal.target_amount) }}</span>
-            <strong>100%</strong>
-          </div>
-          <span class="completed-badge">Completed</span>
-        </a>
+        </div>
         {% endfor %}
       </div>
     </section>
@@ -170,8 +178,8 @@
 
 {% else %}
   <div class="landing-hero">
-    <h1>Welcome to FYP Savings</h1>
-    <p class="hero-subtitle">Track your savings goals, set targets, and achieve your financial dreams.</p>
+    <h1>Welcome to ClearSave</h1>
+    <p class="hero-subtitle">Set targets, track your goals, and achieve your financial dreams.</p>
     <div class="hero-features">
       <div class="feature">
         <h3>📊 Track Progress</h3>
@@ -186,10 +194,60 @@
         <p>Create multiple goals and manage them all in one place</p>
       </div>
     </div>
+
+    <section class="landing-insights" style="margin: 2rem 0;">
+      <h2 style="margin-bottom: 1rem;">Personalised insights</h2>
+      <p class="muted" style="font-size: 0.9rem; margin-bottom: 1rem;">See how your contributions break down when you sign up</p>
+      <div class="card" style="max-width: 340px; margin: 0 auto; padding: 1.25rem;">
+        <div style="max-width: 280px; margin: 0 auto 1rem;">
+          <canvas id="landingContribChart" width="260" height="260"></canvas>
+        </div>
+        <ul class="insights-legend" style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; justify-content: center; font-size: 0.85rem;">
+          <li><span class="legend-dot" style="background: #34c759;"></span> On time: 4</li>
+          <li><span class="legend-dot" style="background: #0071e3;"></span> Lump sums: 3</li>
+          <li><span class="legend-dot" style="background: #ff9500;"></span> Skips: 1</li>
+        </ul>
+      </div>
+    </section>
+
     <div class="hero-actions">
       <a class="btn" href="{{ url_for('signup') }}">Get Started</a>
       <a class="btn secondary" href="{{ url_for('login') }}">Log In</a>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+  (function() {
+    var ctx = document.getElementById('landingContribChart');
+    if (!ctx) return;
+    new Chart(ctx.getContext('2d'), {
+      type: 'pie',
+      data: {
+        labels: ['On time', 'Lump sums', 'Skips'],
+        datasets: [{
+          data: [4, 3, 1],
+          backgroundColor: ['#34c759', '#0071e3', '#ff9500'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                var total = 8;
+                var pct = ((ctx.raw / total) * 100).toFixed(0);
+                return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+              }
+            }
+          }
+        }
+      }
+    });
+  })();
+  </script>
 {% endif %}
 {% endblock %}

@@ -29,15 +29,15 @@
   <dl class="goal-stats goal-view-stats">
     <div>
       <dt>Target</dt>
-      <dd>€{{ "%.2f"|format(goal.target_amount) }}</dd>
+      <dd>€{{ goal.target_amount|format_amount }}</dd>
     </div>
     <div>
       <dt>Saved</dt>
-      <dd>€{{ "%.2f"|format(goal.saved_amount) }}</dd>
+      <dd>€{{ goal.saved_amount|format_amount }}</dd>
     </div>
     <div>
       <dt>Remaining</dt>
-      <dd>€{{ "%.2f"|format(goal.remaining) }}</dd>
+      <dd>€{{ goal.remaining|format_amount }}</dd>
     </div>
     {% if not is_completed %}
     <div>
@@ -46,7 +46,7 @@
     </div>
     <div>
       <dt>Per period</dt>
-      <dd>€{{ "%.2f"|format(goal.recommended_contribution) }}</dd>
+      <dd>€{{ goal.recommended_contribution|format_amount }}</dd>
     </div>
     {% endif %}
     <div>
@@ -55,14 +55,43 @@
     </div>
   </dl>
 
+  <div class="share-cta-wrap">
+    {% if is_completed %}
+      <button type="button" class="btn share-btn-primary" id="shareToggle" aria-expanded="{{ 'true' if share_open else 'false' }}">Share</button>
+    {% else %}
+      <button type="button" class="btn share-btn-primary" id="shareToggle" aria-expanded="{{ 'true' if share_open else 'false' }}">Share progress</button>
+    {% endif %}
+  </div>
+  <div class="share-panel" id="sharePanel" data-share-text="{{ share_text|e }}" {% if not share_open %}hidden{% endif %}>
+    <h4>Share this goal</h4>
+    <p class="share-panel-goal-name">{{ goal.goal_name }}</p>
+    <p class="share-panel-target">Target: €{{ goal.target_amount|format_amount }}</p>
+    <div class="progress-track share-panel-bar">
+      <div class="progress-bar" style="width: {{ goal.percent_complete }}%"></div>
+    </div>
+    <p class="share-panel-percent">{{ "%.0f"|format(goal.percent_complete) }}% complete</p>
+    <p class="share-panel-due">
+      {% if is_completed and goal.completed_at %}
+        Completed: {{ goal.completed_at.strftime("%d %b %Y") if goal.completed_at else goal.target_date.strftime("%d %b %Y") }}
+      {% else %}
+        Due: {{ goal.target_date.strftime("%d %b %Y") }}
+      {% endif %}
+    </p>
+    <div class="share-panel-actions">
+      <a href="#" class="btn share-btn-twitter" target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter">Twitter</a>
+      <a href="#" class="btn share-btn-facebook" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">Facebook</a>
+      <button type="button" class="btn share-btn-copy">Copy</button>
+    </div>
+  </div>
+
   {% if not is_completed and goal.next_due_date %}
   <div class="goal-next {{ 'overdue' if goal.is_due else '' }}">
     <p class="goal-next-label">Next due: {{ goal.next_due_date.strftime("%d %b %Y") }}</p>
-    <p class="goal-next-amount">Suggested: €{{ "%.2f"|format(goal.recommended_contribution) }}</p>
+    <p class="goal-next-amount">Suggested: €{{ goal.recommended_contribution|format_amount }}</p>
     {% if goal.is_due %}
     <div class="goal-due-actions" style="margin-top: 0.75rem;">
       <form method="post" action="{{ url_for('goal_auto_contribute', goal_id=goal.id) }}" style="display: inline;">
-        <button type="submit" class="btn">I contributed €{{ "%.2f"|format(goal.recommended_contribution) }}</button>
+        <button type="submit" class="btn">I contributed €{{ goal.recommended_contribution|format_amount }}</button>
       </form>
       <form method="post" action="{{ url_for('goal_skip_period', goal_id=goal.id) }}" style="display: inline;">
         <button type="submit" class="btn secondary">Skip this period</button>
@@ -89,7 +118,7 @@
       {% for deposit in goal.deposits %}
       <li>
         <span>{{ deposit.created_at.strftime("%d %b %Y") }}</span>
-        <span>€{{ "%.2f"|format(deposit.amount) }}</span>
+        <span>€{{ deposit.amount|format_amount }}</span>
         {% if deposit.note %}<span class="deposit-note">{{ deposit.note }}</span>{% endif %}
       </li>
       {% endfor %}
@@ -99,4 +128,37 @@
     {% endif %}
   </div>
 </article>
+
+<script>
+(function() {
+  var shareToggle = document.getElementById('shareToggle');
+  var sharePanel = document.getElementById('sharePanel');
+  var shareText = sharePanel && sharePanel.getAttribute('data-share-text');
+  if (!shareToggle || !sharePanel) return;
+
+  shareToggle.addEventListener('click', function() {
+    var isOpen = sharePanel.hidden === false;
+    sharePanel.hidden = isOpen;
+    shareToggle.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+  });
+
+  if (shareText) {
+    var encoded = encodeURIComponent(shareText);
+    var twitterEl = sharePanel.querySelector('.share-btn-twitter');
+    var facebookEl = sharePanel.querySelector('.share-btn-facebook');
+    if (twitterEl) twitterEl.href = 'https://twitter.com/intent/tweet?text=' + encoded;
+    if (facebookEl) facebookEl.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.origin + window.location.pathname) + '&quote=' + encoded;
+
+    var copyBtn = sharePanel.querySelector('.share-btn-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        navigator.clipboard.writeText(shareText).then(function() {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(function() { copyBtn.textContent = 'Copy'; }, 2000);
+        });
+      });
+    }
+  }
+})();
+</script>
 {% endblock %}

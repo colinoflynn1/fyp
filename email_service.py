@@ -185,7 +185,7 @@ This link will expire in 1 hour.
 If you did not request this reset, please ignore this email.
 
 Best regards,
-The FYP Team
+The ClearSave Team
     """.strip()
     
     html_body = f"""
@@ -197,7 +197,7 @@ The FYP Team
         <p><a href="{reset_url}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a></p>
         <p>This link will expire in 1 hour.</p>
         <p>If you did not request this reset, please ignore this email.</p>
-        <p>Best regards,<br>The FYP Team</p>
+        <p>Best regards,<br>The ClearSave Team</p>
       </body>
     </html>
     """
@@ -222,6 +222,7 @@ def send_payment_due_email(user_email: str, user_name: str, goal_name: str, amou
     Returns:
         True if email was sent successfully
     """
+    amount_str = f"{float(amount):,.2f}"
     subject = f"Payment Due: {goal_name}"
     body = f"""
 Hello {user_name},
@@ -229,12 +230,12 @@ Hello {user_name},
 This is a reminder that you have a payment due for your savings goal "{goal_name}".
 
 Due Date: {due_date}
-Recommended Amount: €{amount:.2f}
+Recommended Amount: €{amount_str}
 
 Log in to your account to record your contribution.
 
 Best regards,
-The FYP Team
+The ClearSave Team
     """.strip()
     
     html_body = f"""
@@ -245,10 +246,10 @@ The FYP Team
         <p>This is a reminder that you have a payment due for your savings goal <strong>{goal_name}</strong>.</p>
         <ul>
           <li><strong>Due Date:</strong> {due_date}</li>
-          <li><strong>Recommended Amount:</strong> €{amount:.2f}</li>
+          <li><strong>Recommended Amount:</strong> €{amount_str}</li>
         </ul>
         <p>Log in to your account to record your contribution.</p>
-        <p>Best regards,<br>The FYP Team</p>
+        <p>Best regards,<br>The ClearSave Team</p>
       </body>
     </html>
     """
@@ -281,7 +282,7 @@ Congratulations! You've reached {percent:.0f}% of your "{goal_name}" savings goa
 Keep up the great work! You're making excellent progress toward your target.
 
 Best regards,
-The FYP Team
+The ClearSave Team
     """.strip()
     
     html_body = f"""
@@ -291,7 +292,7 @@ The FYP Team
         <p>Hello {user_name},</p>
         <p>Congratulations! You've reached <strong>{percent:.0f}%</strong> of your <strong>{goal_name}</strong> savings goal.</p>
         <p>Keep up the great work! You're making excellent progress toward your target.</p>
-        <p>Best regards,<br>The FYP Team</p>
+        <p>Best regards,<br>The ClearSave Team</p>
       </body>
     </html>
     """
@@ -322,7 +323,7 @@ Congratulations! You've completed your "{goal_name}" savings goal.
 Well done! You can view it in your Previously Completed Goals section.
 
 Best regards,
-The FYP Team
+The ClearSave Team
     """.strip()
 
     html_body = f"""
@@ -332,7 +333,7 @@ The FYP Team
         <p>Hello {user_name},</p>
         <p>Congratulations! You've completed your <strong>{goal_name}</strong> savings goal.</p>
         <p>Well done! You can view it in your Previously Completed Goals section.</p>
-        <p>Best regards,<br>The FYP Team</p>
+        <p>Best regards,<br>The ClearSave Team</p>
       </body>
     </html>
     """

@@ -113,6 +113,22 @@ def parse_proposed_goal(text: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def strip_proposed_goal_json(text: str) -> str:
+    """Remove the proposed_goal JSON block from AI response so only the friendly message is shown."""
+    if not text or not text.strip():
+        return text
+
+    def remove_block(match: re.Match) -> str:
+        content = match.group(1)
+        return "" if "proposed_goal" in content else match.group(0)
+
+    # Remove ```json ... ``` or ``` ... ``` blocks that contain proposed_goal
+    out = re.sub(r"```(?:json)?\s*([\s\S]*?)\s*```", remove_block, text)
+    # Remove any leftover blank lines (e.g. double newline where the block was)
+    out = re.sub(r"\n{3,}", "\n\n", out)
+    return out.strip()
+
+
 # Reference: Based on https://claude.ai/share/dd24da3f-255c-4c31-90c7-6eb800e9fbea
 # https://ai.google.dev/gemini-api/docs/text-generation#multi-turn
 # Reference: Content and Part types - https://googleapis.github.io/python-genai/

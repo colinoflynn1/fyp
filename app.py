@@ -48,6 +48,7 @@ from email_service import (
 )
 from chatbot_service import (
     chat as chatbot_chat,
+    strip_proposed_goal_json,
     validate_and_fix_proposed_goal,
 )
 
@@ -58,6 +59,20 @@ from chatbot_service import (
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-key")
+
+
+def format_amount(value):
+    """Format number with comma thousands separator and 2 decimal places (e.g. 1000 -> 1,000.00)."""
+    if value is None:
+        return ""
+    try:
+        n = float(value)
+        return f"{n:,.2f}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+app.jinja_env.filters["format_amount"] = format_amount
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=7)
 
 # Reference: Based on ItsDangerous Documentation - URL Safe Timed Serializer
@@ -406,8 +421,6 @@ def goals_dashboard():
     )
 
 
-# Reference: Chart.js Documentation - https://www.chartjs.org/docs/latest/
-# Reference: W3Schools Chart.js - https://www.w3schools.com/js/js_graphics_chartjs.asp
 # Insights page - pie chart showing contribution breakdown (on-time, lump sums, skips).
 @app.route("/insights")
 @login_required
@@ -435,11 +448,24 @@ def goal_view(goal_id: int):
     progress = build_goal_progress(goal)
     deposits = list_goal_deposits(goal_id, user_id=current_user.id, limit=50)
     progress["deposits"] = deposits
+    share_open = request.args.get("share") in ("1", "true")
+    # Build share text for social / copy (target, %, due date)
+    target_fmt = f"{float(progress['target_amount']):,.2f}"
+    due_str = progress["target_date"].strftime("%d %b %Y") if progress.get("target_date") else ""
+    completed_at = goal.get("completed_at")
+    if completed_at:
+        completed_str = completed_at.strftime("%d %b %Y") if hasattr(completed_at, "strftime") else str(completed_at)[:10]
+        share_text = f"I hit my {goal['goal_name']} goal on ClearSave! Target €{target_fmt} · Completed {completed_str}. 🎉"
+    else:
+        pct = int(round(float(progress["percent_complete"])))
+        share_text = f"I'm saving for {goal['goal_name']} on ClearSave! Target €{target_fmt} · {pct}% there · Due {due_str}. 🎯"
     return render_template(
         "goal_view.html",
         title=goal["goal_name"],
         goal=progress,
         is_completed=goal.get("completed_at") is not None,
+        share_open=share_open,
+        share_text=share_text,
     )
 
 
@@ -839,6 +865,10 @@ def chat_message():
         return jsonify({"ok": False, "error": str(e)}), 400
     except Exception as e:
         return jsonify({"ok": False, "error": f"AI error: {str(e)}"}), 500
+
+    # Hide the raw JSON block from the user when we show the green "Create this goal?" card
+    if proposed_goal:
+        response_text = strip_proposed_goal_json(response_text)
 
     history.append({"role": "user", "content": user_msg})
     history.append({"role": "assistant", "content": response_text})

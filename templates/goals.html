@@ -26,15 +26,15 @@
         <dl class="goal-stats">
           <div>
             <dt>Target</dt>
-            <dd>€{{ "%.2f"|format(goal.target_amount) }}</dd>
+            <dd>€{{ goal.target_amount|format_amount }}</dd>
           </div>
           <div>
             <dt>Saved</dt>
-            <dd>€{{ "%.2f"|format(goal.saved_amount) }}</dd>
+            <dd>€{{ goal.saved_amount|format_amount }}</dd>
           </div>
           <div>
             <dt>Remaining</dt>
-            <dd>€{{ "%.2f"|format(goal.remaining) }}</dd>
+            <dd>€{{ goal.remaining|format_amount }}</dd>
           </div>
           <div>
             <dt>Days left</dt>
@@ -46,7 +46,7 @@
           </div>
           <div>
             <dt>Per period</dt>
-            <dd>€{{ "%.2f"|format(goal.recommended_contribution) }}</dd>
+            <dd>€{{ goal.recommended_contribution|format_amount }}</dd>
           </div>
         </dl>
 
@@ -56,6 +56,9 @@
           <form method="post" action="{{ url_for('goal_delete', goal_id=goal.id) }}" onsubmit="return confirm('Delete this goal?');">
             <button type="submit" class="btn danger">Delete</button>
           </form>
+        </div>
+        <div class="goal-share-row">
+          <a class="btn share-btn-primary" href="{{ url_for('goal_view', goal_id=goal.id) }}?share=1">Share progress</a>
         </div>
 
         <div class="goal-deposit">
@@ -91,7 +94,7 @@
             </p>
             <p class="goal-next-amount">
               Suggested {{ goal.frequency.replace('-', ' ') }} amount:
-              €{{ "%.2f"|format(goal.recommended_contribution) }}
+              €{{ goal.recommended_contribution|format_amount }}
             </p>
           </div>
 
@@ -99,7 +102,7 @@
             <div class="goal-due-actions">
               <form method="post" action="{{ url_for('goal_auto_contribute', goal_id=goal.id) }}">
                 <button type="submit" class="btn">
-                  Yes, I contributed €{{ "%.2f"|format(goal.recommended_contribution) }}
+                  Yes, I contributed €{{ goal.recommended_contribution|format_amount }}
                 </button>
               </form>
               <form method="post" action="{{ url_for('goal_skip_period', goal_id=goal.id) }}">
@@ -118,7 +121,7 @@
               {% for deposit in goal.recent_deposits %}
                 <li>
                   <span>{{ deposit.created_at.strftime("%d %b") }}</span>
-                  <span>€{{ "%.2f"|format(deposit.amount) }}</span>
+                  <span>€{{ deposit.amount|format_amount }}</span>
                 </li>
               {% endfor %}
             </ul>
@@ -140,29 +143,32 @@
   <h2>Previously Completed Goals</h2>
   <div class="goal-grid completed-goals-grid">
     {% for goal in completed_goals %}
-    <a href="{{ url_for('goal_view', goal_id=goal.id) }}" class="goal-card completed-goal-card">
-      <header>
-        <div>
-          <h3>{{ goal.goal_name }}</h3>
-          <p>Completed {{ goal.completed_at.strftime("%d %b %Y") if goal.completed_at else '' }}</p>
+    <div class="goal-card completed-goal-card">
+      <a href="{{ url_for('goal_view', goal_id=goal.id) }}" class="completed-goal-card-link">
+        <header>
+          <div>
+            <h3>{{ goal.goal_name }}</h3>
+            <p>Completed {{ goal.completed_at.strftime("%d %b %Y") if goal.completed_at else '' }}</p>
+          </div>
+          <span class="completed-badge">100%</span>
+        </header>
+        <div class="progress-track">
+          <div class="progress-bar" style="width: 100%"></div>
         </div>
-        <span class="completed-badge">100%</span>
-      </header>
-      <div class="progress-track">
-        <div class="progress-bar" style="width: 100%"></div>
-      </div>
-      <dl class="goal-stats">
-        <div>
-          <dt>Target</dt>
-          <dd>€{{ "%.2f"|format(goal.target_amount) }}</dd>
-        </div>
-        <div>
-          <dt>Saved</dt>
-          <dd>€{{ "%.2f"|format(goal.saved_amount) }}</dd>
-        </div>
-      </dl>
-      <span class="view-link">View details →</span>
-    </a>
+        <dl class="goal-stats">
+          <div>
+            <dt>Target</dt>
+            <dd>€{{ goal.target_amount|format_amount }}</dd>
+          </div>
+          <div>
+            <dt>Saved</dt>
+            <dd>€{{ goal.saved_amount|format_amount }}</dd>
+          </div>
+        </dl>
+        <span class="view-link">View details →</span>
+      </a>
+      <a href="{{ url_for('goal_view', goal_id=goal.id) }}?share=1" class="btn share-btn-primary">Share</a>
+    </div>
     {% endfor %}
   </div>
 </section>

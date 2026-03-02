@@ -200,6 +200,79 @@ th { background: #fafafa; font-weight: 600; }
   background: var(--accent);
 }
 
+/* Share progress / Share (purple CTA and panel) */
+.share-cta-wrap {
+  margin-top: 1rem;
+}
+.share-cta,
+a.share-cta,
+button.share-cta {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #7c3aed;
+  cursor: pointer;
+  text-decoration: none;
+}
+.share-cta:hover,
+a.share-cta:hover,
+button.share-cta:hover {
+  color: #6d28d9;
+  background: transparent;
+  text-decoration: underline;
+}
+.share-panel {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+}
+.share-panel h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+.share-panel-goal-name {
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+.share-panel-target,
+.share-panel-percent,
+.share-panel-due {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.share-panel-bar {
+  margin: 0.5rem 0;
+  max-width: 240px;
+}
+.share-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.share-panel-actions .btn,
+.share-btn-primary,
+.share-btn-twitter,
+.share-btn-facebook,
+.share-btn-copy {
+  font-size: 0.9rem;
+  background: #7c3aed;
+  color: #fff;
+}
+.share-panel-actions .btn:hover,
+.share-btn-primary:hover,
+.share-btn-twitter:hover,
+.share-btn-facebook:hover,
+.share-btn-copy:hover {
+  background: #6d28d9;
+  color: #fff;
+}
+
 .goal-stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -220,10 +293,19 @@ th { background: #fafafa; font-weight: 600; }
 
 .goal-actions {
   display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 0.6rem;
+}
+.goal-actions > * {
+  flex-shrink: 0;
 }
 .goal-actions form {
   margin: 0;
+  display: inline-block;
+}
+.goal-share-row {
+  margin-top: 0.5rem;
 }
 
 .goal-deposit h4,
@@ -496,14 +578,64 @@ th { background: #fafafa; font-weight: 600; }
   font-size: 0.9rem;
   color: var(--accent);
 }
-.completed-preview-card {
+.completed-goal-card-link {
+  display: block;
   text-decoration: none;
   color: inherit;
+}
+.completed-goal-card-link:hover {
+  text-decoration: none;
+}
+.completed-goal-card .share-cta {
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+.completed-preview-card {
   border-left-color: var(--success);
   background: #f0fdf4;
 }
 .completed-preview-card:hover {
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+.completed-preview-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.completed-preview-link:hover {
+  text-decoration: none;
+}
+.completed-preview-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.completed-badge-btn-size {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.completed-share-btn {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.75rem;
+}
+.goal-preview-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.goal-preview-card-link:hover {
+  text-decoration: none;
+}
+.goal-preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
 }
 .notification-item.goal-completed {
   border-left-color: var(--success);
@@ -751,8 +883,7 @@ th { background: #fafafa; font-weight: 600; }
 
 /* Dashboard Layout with Sidebar
    Reference: MDN CSS Position - https://developer.mozilla.org/en-US/docs/Web/CSS/position
-   Reference: W3Schools Flexbox - https://www.w3schools.com/css/css3_flexbox.asp
-   Reference: MDN Media Queries - https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries/Using_media_queries
+   Reference: W3Schools - https://www.w3schools.com/css/css_margin.asp
 */
 .dashboard-layout {
   position: relative;

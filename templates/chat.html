@@ -84,7 +84,7 @@
 
   function showConfirmCard(goal) {
     document.getElementById('cf-goal-name').textContent = goal.goal_name;
-    document.getElementById('cf-target').textContent = '€' + parseFloat(goal.target_amount).toFixed(2);
+    document.getElementById('cf-target').textContent = '€' + parseFloat(goal.target_amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     document.getElementById('cf-frequency').textContent = goal.frequency;
     document.getElementById('cf-date').textContent = goal.target_date;
     cfError.style.display = 'none';

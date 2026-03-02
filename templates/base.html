@@ -5,18 +5,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>{{ title or "FYP App" }}</title>
+  <title>{{ title or "ClearSave" }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container">
     <nav>
-      <a href="{{ url_for('home') }}" class="logo">FYP</a>
+      <a href="{{ url_for('home') }}" class="logo">ClearSave</a>
       <div class="links">
         {% if current_user.is_authenticated %}
           <a href="{{ url_for('goals_dashboard') }}">Savings</a>
           <a href="{{ url_for('insights') }}">Insights</a>
-          <a href="{{ url_for('chat_page') }}">Chat</a>
+          <a href="{{ url_for('chat_page') }}">AI chatbot</a>
           <a href="{{ url_for('settings') }}">Settings</a>
           {% if current_user.is_admin %}
             <a href="{{ url_for('users') }}">Admin</a>
