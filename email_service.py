@@ -32,7 +32,9 @@ def send_email(to_email: str, subject: str, body: str, html_body: Optional[str] 
         message['from'] = sender_email
         message['subject'] = subject
 
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
             smtp.login(sender_email, app_password)
             smtp.sendmail(sender_email, to_email, message.as_string())
 
