@@ -1,43 +1,36 @@
-"""Email integration for sending notifications via Gmail SMTP."""
+"""Email integration for sending notifications via Resend API."""
 
 from __future__ import annotations
 
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from dotenv import load_dotenv
+import resend
 
 load_dotenv()
 
 
 def send_email(to_email: str, subject: str, body: str, html_body: Optional[str] = None) -> bool:
+    api_key = os.getenv("RESEND_API_KEY")
     sender_email = os.getenv("GMAIL_SENDER_EMAIL")
-    app_password = os.getenv("GMAIL_APP_PASSWORD")
 
-    if not sender_email or not app_password:
-        print(f"Email not configured. Would send to {to_email}: {subject}")
+    if not api_key:
+        print(f"Resend not configured. Would send to {to_email}: {subject}")
         return False
 
+    resend.api_key = api_key
+
     try:
+        params = {
+            "from": f"ClearSave <onboarding@resend.dev>",
+            "to": [to_email],
+            "subject": subject,
+            "text": body,
+        }
         if html_body:
-            message = MIMEMultipart('alternative')
-            message.attach(MIMEText(body, 'plain'))
-            message.attach(MIMEText(html_body, 'html'))
-        else:
-            message = MIMEText(body)
+            params["html"] = html_body
 
-        message['to'] = to_email
-        message['from'] = sender_email
-        message['subject'] = subject
-
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.login(sender_email, app_password)
-            smtp.sendmail(sender_email, to_email, message.as_string())
-
+        resend.Emails.send(params)
         print(f"Email sent successfully to {to_email}")
         return True
 
