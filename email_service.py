@@ -13,6 +13,7 @@ load_dotenv()
 
 def send_email(to_email: str, subject: str, body: str, html_body: Optional[str] = None) -> bool:
     api_key = os.getenv("BREVO_API_KEY")
+    print(f"Brevo key starts with: {api_key[:10] if api_key else 'NOT FOUND'}")
 
     if not api_key:
         print(f"Brevo not configured. Would send to {to_email}: {subject}")
