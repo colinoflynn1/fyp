@@ -1,39 +1,47 @@
-"""Email integration for sending notifications via Resend API."""
+"""Email integration for sending notifications via Brevo API."""
 
 from __future__ import annotations
 
 import os
 from typing import Optional
 from dotenv import load_dotenv
-import resend
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
 load_dotenv()
 
 
 def send_email(to_email: str, subject: str, body: str, html_body: Optional[str] = None) -> bool:
-    api_key = os.getenv("RESEND_API_KEY")
-    sender_email = os.getenv("GMAIL_SENDER_EMAIL")
+    api_key = os.getenv("BREVO_API_KEY")
 
     if not api_key:
-        print(f"Resend not configured. Would send to {to_email}: {subject}")
+        print(f"Brevo not configured. Would send to {to_email}: {subject}")
         return False
 
-    resend.api_key = api_key
-
     try:
-        params = {
-            "from": f"ClearSave <onboarding@resend.dev>",
-            "to": [to_email],
-            "subject": subject,
-            "text": body,
-        }
-        if html_body:
-            params["html"] = html_body
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = api_key
 
-        resend.Emails.send(params)
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+
+        sender = {"name": "ClearSave", "email": "colinoflynn20@gmail.com"}
+        to = [{"email": to_email}]
+
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=to,
+            sender=sender,
+            subject=subject,
+            text_content=body,
+            html_content=html_body if html_body else body
+        )
+
+        api_instance.send_transac_email(send_smtp_email)
         print(f"Email sent successfully to {to_email}")
         return True
 
+    except ApiException as e:
+        print(f"Brevo API error: {e}")
+        return False
     except Exception as e:
         print(f"Error sending email: {e}")
         return False
