@@ -152,7 +152,7 @@ def home():
             notifications = list_notifications(current_user.id, limit=10, unread_only=True)
             
             # Check for payment due dates and create notifications
-            check_payment_due_notifications(current_user.id)
+            new_notification_ids = check_payment_due_notifications(current_user.id)
             
             # Re-fetch notifications after checking
             notifications = list_notifications(current_user.id, limit=10, unread_only=True)
@@ -168,8 +168,8 @@ def home():
         completed_goals = [build_goal_progress(g) for g in completed_raw]
         
         # Send email notifications if enabled
-        if user and user.get("email_notifications"):
-            # Check for payment due dates to email
+        # Send email notifications only when new notifications are created
+        if user and user.get("email_notifications") and new_notification_ids:
             for goal in enriched_goals:
                 if goal.get("is_due") and goal.get("next_due_date"):
                     send_payment_due_email(
