@@ -210,10 +210,10 @@ def check_payment_due_notifications(user_id: int) -> List[int]:
                 # Check ALL notifications (read and unread) to prevent recreating after marking as read
                 existing = list_notifications(user_id, limit=100, unread_only=False)
                 if not any(
-                    n.get("goal_id") == goal["id"] 
-                    and n.get("notification_type") == "payment_due"
-                    and f"{days_until_due} day" in n.get("message", "").lower()
-                    for n in existing
+                        n.get("goal_id") == goal["id"]
+                        and n.get("notification_type") == "payment_due"
+                        and n.get("title") == title
+                        for n in existing
                 ):
                     notif_id = create_notification(
                         user_id,
