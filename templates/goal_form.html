@@ -28,7 +28,7 @@
       id="target_amount"
       name="target_amount"
       min="0"
-      step="10.00"
+      step="any"
       value="{{ goal.target_amount if goal else '' }}"
       required
     >
@@ -75,7 +75,7 @@
         id="initial_deposit"
         name="initial_deposit"
         min="0"
-        step="10.00"
+        step="any"
         value="{{ goal.initial_deposit if goal else '' }}"
         placeholder="Enter 0 if none"
       >

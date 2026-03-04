@@ -103,7 +103,7 @@
     <h4>Add lump sum</h4>
     <form method="post" action="{{ url_for('goal_deposit', goal_id=goal.id) }}">
       <div class="inline-fields">
-        <input type="number" name="amount" min="0" step="10.00" placeholder="Amount (€)" required>
+        <input type="number" name="amount" min="0" step="any" placeholder="Amount (€)" required>
         <input type="text" name="note" placeholder="Note (optional)">
         <button type="submit">Submit</button>
       </div>
