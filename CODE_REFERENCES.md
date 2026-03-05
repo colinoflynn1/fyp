@@ -11,18 +11,20 @@ This document lists all references and sources for code sections in this project
 ### Password Reset Token Serialization
 - **Reference**: Based on ItsDangerous Documentation - URL Safe Timed Serializer
   - URL: https://itsdangerous.palletsprojects.com/en/2.1.x/serializer/
+- **Reference**: Based on ItsDangerous Documentation - Loading Tokens
+  - URL: https://itsdangerous.palletsprojects.com/en/2.1.x/serializer/#loading
 
 ### Flask-Login Setup
 - **Reference**: Based on Flask-Login Documentation - Initializing the Login Manager
   - URL: https://flask-login.readthedocs.io/en/latest/#flask_login.LoginManager
-
-### User Class (AuthUser)
 - **Reference**: Based on Flask-Login Documentation - User Class
   - URL: https://flask-login.readthedocs.io/en/latest/#flask_login.UserMixin
-
-### User Loader
 - **Reference**: Based on Flask-Login Documentation - User Loader
   - URL: https://flask-login.readthedocs.io/en/latest/#flask_login.LoginManager.user_loader
+- **Reference**: Based on Flask-Login Documentation - Login Example
+  - URL: https://flask-login.readthedocs.io/en/latest/#login-example
+- **Reference**: Based on Flask-Login Documentation - Logout
+  - URL: https://flask-login.readthedocs.io/en/latest/#flask_login.logout_user
 
 ### Admin Decorator
 - **Reference**: Based on Flask Documentation - Decorators
@@ -35,47 +37,25 @@ This document lists all references and sources for code sections in this project
   - URL: https://flask.palletsprojects.com/en/3.0.x/quickstart/#routing
 - **Reference**: Based on Flask Documentation - Template Rendering
   - URL: https://flask.palletsprojects.com/en/3.0.x/quickstart/#rendering-templates
-
-### HTTP Methods
 - **Reference**: Based on Flask Documentation - HTTP Methods
   - URL: https://flask.palletsprojects.com/en/3.0.x/quickstart/#http-methods
-
-### Login/Logout
-- **Reference**: Based on Flask-Login Documentation - Login Example
-  - URL: https://flask-login.readthedocs.io/en/latest/#login-example
-- **Reference**: Based on Flask-Login Documentation - Logout
-  - URL: https://flask-login.readthedocs.io/en/latest/#flask_login.logout_user
-
-### Password Reset
-- **Reference**: Based on ItsDangerous Documentation - URL Safe Timed Serializer
-  - URL: https://itsdangerous.palletsprojects.com/en/2.1.x/serializer/
-- **Reference**: Based on ItsDangerous Documentation - Loading Tokens
-  - URL: https://itsdangerous.palletsprojects.com/en/2.1.x/serializer/#loading
-
-### Form Handling
 - **Reference**: Based on Flask Documentation - Request Data
   - URL: https://flask.palletsprojects.com/en/3.0.x/quickstart/#accessing-request-data
-
-### Variable Rules
 - **Reference**: Based on Flask Documentation - Variable Rules
   - URL: https://flask.palletsprojects.com/en/3.0.x/quickstart/#variable-rules
-
-### Request Referrer
 - **Reference**: Based on Flask Documentation - Request Referrer
   - URL: https://flask.palletsprojects.com/en/3.0.x/api/#flask.Request.referrer
+- **Reference**: Based on Flask form handling docs
+  - URL: https://flask.palletsprojects.com/patterns/wtforms/
 
-### Decimal Parsing
+### Decimal & Date Parsing
 - **Reference**: Based on Python Decimal docs + Flask request handling
   - URL: https://docs.python.org/3/library/decimal.html
-
-### Date Parsing
 - **Reference**: Based on Python datetime strptime patterns
   - URL: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
 
 ### Dashboard & Notifications
 - **Reference**: Based on Flask docs on login_required dashboards + personal design
-- **Reference**: Based on Flask form handling docs
-  - URL: https://flask.palletsprojects.com/patterns/wtforms/
 
 ## user.py
 
@@ -140,7 +120,7 @@ This document lists all references and sources for code sections in this project
 
 ## email_service.py
 
-### Gmail API Authentication
+### Gmail API Authentication (previous iteration)
 - **Reference**: Based on Gmail API Python Quickstart
   - URL: https://developers.google.com/gmail/api/quickstart/python
 - **Reference**: Based on Google Auth Library Documentation
@@ -160,6 +140,10 @@ This document lists all references and sources for code sections in this project
 - **Password Reset Email**: Based on standard email template pattern for password reset
 - **Payment Due Email**: Based on notification email template pattern
 - **Milestone Email**: Based on achievement notification email pattern
+
+### Brevo Email (Iteration 6)
+- **Reference**: Brevo transactional emails (email_service.py) – https://developers.brevo.com/docs/send-a-transactional-email
+- **Reference**: Brevo – https://app.brevo.com/
 
 ## goals.py
 
@@ -232,8 +216,8 @@ This document lists all references and sources for code sections in this project
 - **Pattern**: Mirrors milestone and payment-due notification styling
 
 ## chatbot_service.py (AI Chatbot)
-- **Reference** : https://www.youtube.com/watch?v=CaxPa1FuHx4
-- **Reference** : https://claude.ai/share/dd24da3f-255c-4c31-90c7-6eb800e9fbea
+- **Reference**: https://www.youtube.com/watch?v=CaxPa1FuHx4
+- **Reference**: https://claude.ai/share/dd24da3f-255c-4c31-90c7-6eb800e9fbea
 
 ### Gemini API Integration
 - **Reference**: Based on Google Gen AI SDK Documentation
@@ -316,16 +300,33 @@ This document lists all references and sources for code sections in this project
 
 ---
 
-## Iteration 4 – Contribution Insights & Savings Tips
+## Iteration 5 – Contribution Insights & Savings Tips
 
 ### Pie Chart (Insights page)
 - **Reference**: Chart.js Documentation – https://www.chartjs.org/docs/latest/
 - **Reference**: W3Schools Chart.js – https://www.w3schools.com/js/js_graphics_chartjs.asp
-- *(Add your AI reference here if used)*
+- **Reference**: Claude (insights / pie chart) – https://claude.ai/share/caeeec80-5da9-4eb0-bbc6-976de6e0c2a6
 
 ### Savings Tips Sidebar (Home page)
 - **Reference**: MDN CSS Position – https://developer.mozilla.org/en-US/docs/Web/CSS/position
 - **Reference**: MDN aside element – https://developer.mozilla.org/en-US/docs/Web/HTML/Element/aside
 - **Reference**: MDN rel=noopener – https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/noopener
-- *(Add your AI reference here if used)*
+
+---
+
+## Iteration 6 – Share to Social Media, Railway Deployment, Brevo Email
+### Share to Social Media
+- **Reference**: Twitter Web – https://developer.twitter.com/en/docs/twitter-for-websites/tweet-button/guides/web-intent
+- **Reference**: Facebook Share  – https://developers.facebook.com/docs/sharing/reference/share-dialog
+- **Reference**: – https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText
+- **Reference**: https://claude.ai/share/53ceb8b2-8190-402e-a004-9e342daff8b0
+- **Reference**: https://claude.ai/share/a7de2e6f-46dd-493c-961c-8cab9b12819b
+
+### Railway Live Deployment
+- **Reference**: Deploy a Flask App (Railway deployment guide) – https://docs.railway.com/guides/flask
+
+### Brevo Email
+- **Reference**: Brevo transactional emails – https://developers.brevo.com/docs/send-a-transactional-email
+- **Reference**: Brevo – https://app.brevo.com/
+
 

@@ -1,5 +1,7 @@
 """Email integration for sending notifications via Brevo API."""
 
+# Reference: Brevo transactional emails – https://developers.brevo.com/docs/send-a-transactional-email
+
 from __future__ import annotations
 
 import os

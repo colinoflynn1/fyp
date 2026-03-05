@@ -1,4 +1,5 @@
 # app.py
+# Reference: Deploy Flask app to Railway – https://docs.railway.com/guides/flask
 #start
 import os
 from datetime import datetime, timedelta
@@ -436,8 +437,9 @@ def insights():
     )
 
 
-# Reference: Flask variable rules - https://flask.palletsprojects.com/en/3.0.x/quickstart/#variable-rules
-# Reference: get_user_goal, build_goal_progress, list_goal_deposits from goals.py (project-internal)
+
+# Reference: get_user_goal, build_goal_progress, list_goal_deposits from goals.py 
+# Reference: https://claude.ai/share/53ceb8b2-8190-402e-a004-9e342daff8b0
 @app.route("/goals/<int:goal_id>")
 @login_required
 def goal_view(goal_id: int):
@@ -450,7 +452,7 @@ def goal_view(goal_id: int):
     deposits = list_goal_deposits(goal_id, user_id=current_user.id, limit=50)
     progress["deposits"] = deposits
     share_open = request.args.get("share") in ("1", "true")
-    # Build share text for social / copy (target, %, due date)
+    # Reference: https://claude.ai/share/53ceb8b2-8190-402e-a004-9e342daff8b0
     target_fmt = f"{float(progress['target_amount']):,.2f}"
     due_str = progress["target_date"].strftime("%d %b %Y") if progress.get("target_date") else ""
     completed_at = goal.get("completed_at")
