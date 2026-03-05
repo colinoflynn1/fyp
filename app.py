@@ -148,6 +148,7 @@ def home():
         
         # Get unread notifications (only if dashboard notifications are enabled)
         notifications = []
+        new_notification_ids = []
         if user and user.get("dashboard_notifications", True):
             notifications = list_notifications(current_user.id, limit=10, unread_only=True)
             
